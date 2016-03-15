@@ -3,12 +3,13 @@ import qualified Data.Map as M
 import XMonad.Prompt
 import XMonad.Prompt.Shell
 import XMonad.Prompt.XMonad
+import XMonad.Prompt.RunOrRaise
 import XMonad.Actions.WindowBringer
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Util.Run(spawnPipe)
-import XMonad.Util.EZConfig(additionalKeys)
+import XMonad.Util.EZConfig(additionalKeysP)
 import System.IO
 
 main = do
@@ -22,9 +23,14 @@ main = do
                         , ppTitle = xmobarColor "green" "" . shorten 50
                         }
         , modMask = modm     -- Rebind Mod to the Windows key
-        } `additionalKeys`
-        [ ((modm, xK_g ), gotoMenu)
-        , ((modm, xK_b ), bringMenu)
+	, borderWidth = 2
+	-- , focusedBorderColor = "#d00000"
+	-- , normalBorderColor = "#000000"
+        } `additionalKeysP`
+        [ ("M1-<Space> g", gotoMenu)
+        , ("M1-<Space> b", bringMenu)
+        , ("M1-<Space> m", runOrRaisePrompt defaultXPConfig)
+        , ("M1-<Space> x", xmonadPrompt defaultXPConfig)
         ]
 
     where modm = mod4Mask
