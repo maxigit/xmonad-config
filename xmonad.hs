@@ -7,6 +7,7 @@ import XMonad.Prompt.RunOrRaise
 import XMonad.Actions.WindowBringer
 import XMonad.Actions.UpdateFocus
 import XMonad.Actions.CopyWindow
+import XMonad.Actions.Submap
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -14,6 +15,7 @@ import XMonad.Hooks.FadeInactive
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeysP)
 import System.IO
+import Data.Bits(complement, (.&.))
 
 main = do
     xmproc <- spawnPipe "xmobar"
@@ -36,12 +38,17 @@ main = do
                        ( [ ("M1-<Space> g", gotoMenu)
                          , ("M1-<Space> b", bringMenu)
                          , ("M1-<Space> m", runOrRaisePrompt defaultXPConfig)
-                         , ("M1-<Space> x", xmonadPrompt defaultXPConfig)
+                         , ("M1-<Space> ;", xmonadPrompt defaultXPConfig)
 
                          ] 
                        ++ [("M1-<Space> c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
                        )
 
         modm = mod4Mask
-    xmonad config
+        confKeys = keys config
+    xmonad $ config { keys = remap (mod1Mask, xK_space) confKeys  }
+
+remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
+                       resetModifier (m, k) = (m .&. complement mod4Mask, k)
+                 in M.fromList [(mod, submap $ keys' k)]
           
