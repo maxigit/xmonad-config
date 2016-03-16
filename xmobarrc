@@ -53,7 +53,7 @@ Config {
 
         -- cpu activity monitor
         , Run MultiCpu       [ -- "--template" , "Cpu: <bar><vbar> <total0>%|<total1>%"
-                             "--template" , "Cpu: <autototal>"
+                             "--template" , "Cpu: <autototal>%"
                              , "--Low"      , "50"         -- units: %
                              , "--High"     , "85"         -- units: %
                              , "--low"      , "darkgreen"
