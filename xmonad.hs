@@ -10,6 +10,7 @@ import XMonad.Actions.CopyWindow
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.FadeInactive
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeysP)
 import System.IO
@@ -26,10 +27,11 @@ main = do
                         { ppOutput = hPutStrLn xmproc
                         , ppTitle = xmobarColor "green" "" . shorten 50
                         }
+                        <+> fadeInactiveLogHook 0.8
         , modMask = modm     -- Rebind Mod to the Windows key
-	, borderWidth = 2
-	-- , focusedBorderColor = "#d00000"
-	-- , normalBorderColor = "#000000"
+	, borderWidth = 1
+	, focusedBorderColor = "#ffffff"
+	, normalBorderColor = "#000000"
         } `additionalKeysP`
         ( [ ("M1-<Space> g", gotoMenu)
           , ("M1-<Space> b", bringMenu)
