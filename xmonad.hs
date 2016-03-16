@@ -18,28 +18,30 @@ import System.IO
 main = do
     xmproc <- spawnPipe "xmobar"
 
-    xmonad $ defaultConfig
-        { manageHook = manageDocks <+> manageHook defaultConfig
-        , startupHook = adjustEventInput
-        , handleEventHook = focusOnMouseMove
-        , layoutHook = avoidStruts  $  layoutHook defaultConfig
-        , logHook = dynamicLogWithPP xmobarPP
-                        { ppOutput = hPutStrLn xmproc
-                        , ppTitle = xmobarColor "green" "" . shorten 50
-                        }
-                        <+> fadeInactiveLogHook 0.8
-        , modMask = modm     -- Rebind Mod to the Windows key
-	, borderWidth = 1
-	, focusedBorderColor = "#ffffff"
-	, normalBorderColor = "#000000"
-        } `additionalKeysP`
-        ( [ ("M1-<Space> g", gotoMenu)
-          , ("M1-<Space> b", bringMenu)
-          , ("M1-<Space> m", runOrRaisePrompt defaultXPConfig)
-          , ("M1-<Space> x", xmonadPrompt defaultXPConfig)
+    let config =  defaultConfig
+                       { manageHook = manageDocks <+> manageHook defaultConfig
+                       , startupHook = adjustEventInput
+                       , handleEventHook = focusOnMouseMove
+                       , layoutHook = avoidStruts  $  layoutHook defaultConfig
+                       , logHook = dynamicLogWithPP xmobarPP
+                                       { ppOutput = hPutStrLn xmproc
+                                       , ppTitle = xmobarColor "green" "" . shorten 50
+                                       }
+                                       <+> fadeInactiveLogHook 0.8
+                       , modMask = modm     -- Rebind Mod to the Windows key
+	               , borderWidth = 1
+	               , focusedBorderColor = "#ffffff"
+	               , normalBorderColor = "#000000"
+                       } `additionalKeysP`
+                       ( [ ("M1-<Space> g", gotoMenu)
+                         , ("M1-<Space> b", bringMenu)
+                         , ("M1-<Space> m", runOrRaisePrompt defaultXPConfig)
+                         , ("M1-<Space> x", xmonadPrompt defaultXPConfig)
 
-          ] 
-        ++ [("M1-<Space> c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
-        )
+                         ] 
+                       ++ [("M1-<Space> c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
+                       )
 
-    where modm = mod4Mask
+        modm = mod4Mask
+    xmonad config
+          
