@@ -35,13 +35,13 @@ main = do
 	               , focusedBorderColor = "#ffffff"
 	               , normalBorderColor = "#000000"
                        } `additionalKeysP`
-                       ( [ ("M1-<Space> g", gotoMenu)
-                         , ("M1-<Space> b", bringMenu)
-                         , ("M1-<Space> m", runOrRaisePrompt defaultXPConfig)
-                         , ("M1-<Space> ;", xmonadPrompt defaultXPConfig)
+                       ( [ ("g", gotoMenu)
+                         , ("b", bringMenu)
+                         , ("M1-<Space>", runOrRaisePrompt defaultXPConfig)
+                         , (";", xmonadPrompt defaultXPConfig)
 
                          ] 
-                       ++ [("M1-<Space> c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
+                       ++ [("c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
                        )
 
         modm = mod4Mask
