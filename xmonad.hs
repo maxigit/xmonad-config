@@ -17,6 +17,12 @@ import XMonad.Util.EZConfig(additionalKeysP)
 import System.IO
 import Data.Bits(complement, (.&.))
 
+
+layout = tiled ||| Mirror tiled ||| Full ||| tiledG ||| Mirror tiledG
+  where
+      tiled = Tall 1 (10/100) (1/2)
+      tiledG = Tall 1 (10/100) (2/3)
+       
 main = do
     xmproc <- spawnPipe "xmobar"
 
@@ -24,7 +30,7 @@ main = do
                        { manageHook = manageDocks <+> manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
-                       , layoutHook = avoidStruts  $  layoutHook defaultConfig
+                       , layoutHook = avoidStruts layout
                        , logHook = dynamicLogWithPP xmobarPP
                                        { ppOutput = hPutStrLn xmproc
                                        , ppTitle = xmobarColor "green" "" . shorten 50
