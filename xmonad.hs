@@ -1,4 +1,4 @@
-import XMonad
+import XMonad hiding((|||))
 import qualified Data.Map as M
 import XMonad.Prompt
 import XMonad.Prompt.Shell
@@ -8,6 +8,10 @@ import XMonad.Actions.WindowBringer
 import XMonad.Actions.UpdateFocus
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.Submap
+
+       -- to enable layout jump
+import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
+import XMonad.Layout.Renamed (renamed, Rename(Replace))
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -18,10 +22,16 @@ import System.IO
 import Data.Bits(complement, (.&.))
 
 
-layout = tiled ||| Mirror tiled ||| Full ||| tiledG ||| Mirror tiledG
+layout = name "Hor" tiled
+     ||| name "Ver" (Mirror tiled)
+     ||| name "Full"Full
+     ||| name "HorG" tiledG
+     ||| name "VerG" (Mirror tiledG)
   where
-      tiled = Tall 1 (10/100) (1/2)
-      tiledG = Tall 1 (10/100) (2/3)
+    name n = renamed [Replace n]
+    tiled = Tall 1 (10/100) (1/2)
+    tiledG = Tall 1 (10/100) (g/(1+g))
+    g= 1.61 -- Golden ratio
        
 main = do
     xmproc <- spawnPipe "xmobar"
@@ -43,9 +53,13 @@ main = do
                        } `additionalKeysP`
                        ( [ ("g", gotoMenu)
                          , ("b", bringMenu)
-                         , ("M1-<Space>", runOrRaisePrompt defaultXPConfig)
+                         , ("M1-S-<Space>", runOrRaisePrompt defaultXPConfig)
                          , (";", xmonadPrompt defaultXPConfig)
-
+                         , ("f", sendMessage $ JumpToLayout "Full")
+                         , ("h", sendMessage $ JumpToLayout "Hor")
+                         , ("v", sendMessage $ JumpToLayout "Ver")
+                         , ("S-h", sendMessage $ JumpToLayout "HorG")
+                         , ("S-v", sendMessage $ JumpToLayout "VerG")
                          ] 
                        ++ [("c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
                        )
