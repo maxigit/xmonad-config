@@ -21,6 +21,7 @@ import XMonad.Actions.Search
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
+import XMonad.Layout.ToggleLayouts
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -32,9 +33,10 @@ import System.IO
 import Data.Bits(complement, (.&.))
 
 
-layout = name "Hor" tiled
+layout = toggleLayouts Full layout'
+layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
-     ||| name "Full"Full
+     -- ||| name "Full" Full
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
   where
@@ -78,7 +80,7 @@ main = do
         -- @ will be replace by the "leader"
         commands = [
                    -- layout
-                     ("@f", "Full" , sendMessage $ JumpToLayout "Full")
+                     ("@f", "Full" , sendMessage $ ToggleLayout)
                    , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
                    , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
@@ -95,7 +97,9 @@ main = do
                      , ("@>", "Shrink", sendMessage Expand)
                      , ("@,", "Decrement master", sendMessage $ IncMasterN (-1) ) -- 
                      , ("@.", "Increment master", sendMessage $ IncMasterN 1)
-                   , ("@ S", "Sink window", withFocused $ windows . W.sink)
+                     , ("@ S", "Sink window", withFocused $ windows . W.sink)
+                     , ("@ g", "Goto window", gotoMenu )
+                     , ("@ b", "Goto window", bringMenu )
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
