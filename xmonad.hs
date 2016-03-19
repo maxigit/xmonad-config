@@ -11,6 +11,7 @@ import XMonad.Actions.Commands
 import XMonad.Actions.UpdateFocus
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.Submap
+import XMonad.Actions.CycleWS
 
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
@@ -81,28 +82,55 @@ main = do
                    , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                    , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
                    , ("@ <Space>", "Prompt", runCommand commands')
-                   , ("@ r", "Prompt", runCommand commands')
+                   , ("@ r", "Prompt", xmonadPromptC commands' defaultXPConfig)
+                   , ("@ R", "Refresh", refresh)
                    , ("M1-;", "run or raise", runOrRaisePrompt defaultXPConfig)
                    -- windows
                      , ("@<", "Shrink", sendMessage Shrink)
                      , ("@>", "Shrink", sendMessage Expand)
                      , ("@,", "Decrement master", sendMessage $ IncMasterN (-1) ) -- 
                      , ("@.", "Increment master", sendMessage $ IncMasterN 1)
+                   , ("@ S", "Sink window", withFocused $ windows . W.sink)
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
-                     , ("@S-n", "Swap Next", windows W.swapUp)
-                     , ("@S-m", "Swap Master", windows W.swapMaster)
-                   --   layerk
+                     , ("@S-n", "Swap next", windows W.swapUp)
+                     , ("@S-m", "Swap master", windows W.swapMaster)
                    -- applications
-                       , ("@ a t", "teriminal", spawn =<< asks (terminal . XMonad.config))
+                       , ("@ a t", "terminal", spawn =<< asks (terminal . XMonad.config))
+                       , ("@ a f", "Firefox", spawn "firefox")
+                       , ("@ a e", "Emacs", spawn "emacs")
+                       , ("@ a E", "Emacs -nw", spawn "emacs")
                    -- workspaces
+                       , ("@ l l", "Toggle to previous Workspace ", toggleWS)
+                       , ("@ l n", "Switch to next (non-empty) workspace ", moveTo Next NonEmptyWS  )
+                       , ("@ l S-n", "Switch to next Workspace ", nextWS)
+                       , ("@ l e", "Switch to next empty workspace ", moveTo Next EmptyWS  )
+                       , ("@ l p", "Switch to previous (non-empty) workspace ", moveTo Prev NonEmptyWS  )
+                       , ("@ l S-p", "Switch to previous Workspace ", prevWS )
                    ]
+		   ++
+                   [ (key ++ show i, description ++ show i, sequence_ $ map windows (map ($show i) command))
+                   | i <- [1..9] :: [Int]
+		   , (key, description, command) <- [ ("M1-",  "Switch to ", [W.greedyView])
+					            , ("@ l ", "Layer ", [W.greedyView])
+					            , ("M1-S-", "Shift (push) ", [W.shift])
+					            , ("@ S-p ", "Push ", [W.shift])
+			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
+			 	                    , ("@ S-t ", "Put ", [copy])
+			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
+-- d delete
+-- D delete all others
+			 		           ]
+			 
+                  ]
+
         commands' = [(s, c) | (_,s,c) <- commands, s /= ""]
+	-- commands' = [("dummy", return ())]
         myKeys c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
         -- (subtitle "Custom Keys":) $ mkNamedKeymap c $
         --                [ ("M1-S-;", addName "run command" $ runCommand commands') ]
-        processKey ('@':k) = "M1-<Space> " ++ k
+        processKey ('@':k) = "M1-<Space> " ++ processKey k
         processKey k = k
 
         modm = mod4Mask
