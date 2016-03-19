@@ -103,6 +103,8 @@ main = do
                      , ("@ S", "Sink window", withFocused $ windows . W.sink)
                      , ("@ g", "Goto window", gotoMenu )
                      , ("@ b", "Goto window", bringMenu )
+                     , ("@ d", "Delete window", kill1 )
+                     , ("@ D", "Delete all copy window", kill1 )
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
