@@ -12,6 +12,8 @@ import XMonad.Actions.UpdateFocus
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.Submap
 import XMonad.Actions.CycleWS
+import XMonad.Actions.FindEmptyWorkspace
+import XMonad.Actions.FocusNth
 
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
@@ -108,8 +110,10 @@ main = do
                        , ("@ l e", "Switch to next empty workspace ", moveTo Next EmptyWS  )
                        , ("@ l p", "Switch to previous (non-empty) workspace ", moveTo Prev NonEmptyWS  )
                        , ("@ l S-p", "Switch to previous Workspace ", prevWS )
+                       , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
+                       , ("@ p S-e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
-		   ++
+		   ++ -- Workspaces operations
                    [ (key ++ show i, description ++ show i, sequence_ $ map windows (map ($show i) command))
                    | i <- [1..9] :: [Int]
 		   , (key, description, command) <- [ ("M1-",  "Switch to ", [W.greedyView])
@@ -123,6 +127,10 @@ main = do
 -- D delete all others
 			 		           ]
 			 
+                  ]
+                  ++ -- windows operations
+                  [ ("@ w " ++ show i, "Focus to " ++ show i, focusNth (i-1) )
+                    | i <- [1..9]
                   ]
 
         commands' = [(s, c) | (_,s,c) <- commands, s /= ""]
