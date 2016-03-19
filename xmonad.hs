@@ -14,6 +14,7 @@ import XMonad.Actions.Submap
 import XMonad.Actions.CycleWS
 import XMonad.Actions.FindEmptyWorkspace
 import XMonad.Actions.FocusNth
+import XMonad.Actions.Promote
 
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
@@ -98,6 +99,7 @@ main = do
                      , ("@n", "Focus Next", windows W.focusDown)
                      , ("@S-n", "Swap next", windows W.swapUp)
                      , ("@S-m", "Swap master", windows W.swapMaster)
+                     , ("@w w", "Focus Next", promote) -- windows W.focusDown)
                    -- applications
                        , ("@ a t", "terminal", spawn =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "firefox")
