@@ -6,6 +6,7 @@ import XMonad.Prompt
 import XMonad.Prompt.Shell
 import XMonad.Prompt.XMonad
 import XMonad.Prompt.RunOrRaise
+import XMonad.Actions.WindowGo
 import XMonad.Actions.WindowBringer
 import XMonad.Actions.Commands
 import XMonad.Actions.UpdateFocus
@@ -15,6 +16,7 @@ import XMonad.Actions.CycleWS
 import XMonad.Actions.FindEmptyWorkspace
 import XMonad.Actions.FocusNth
 import XMonad.Actions.Promote
+import XMonad.Actions.Search
 
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
@@ -61,8 +63,8 @@ main = do
                        } `additionalKeysP`
                        ( [ ("g", gotoMenu)
                          , ("b", bringMenu)
-                         , ("M1-S-<Space>", runOrRaisePrompt defaultXPConfig)
-                         , (";", xmonadPrompt defaultXPConfig)
+                         , ("M1-S-<Space>", runOrRaisePrompt xpConfig)
+                         , (";", xmonadPrompt xpConfig)
                          , ("f", sendMessage $ JumpToLayout "Full")
                          , ("h", sendMessage $ JumpToLayout "Hor")
                          , ("v", sendMessage $ JumpToLayout "Ver")
@@ -85,9 +87,9 @@ main = do
                    , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                    , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
                    , ("@ <Space>", "Prompt", runCommand commands')
-                   , ("@ r", "Prompt", xmonadPromptC commands' defaultXPConfig)
+                   , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
                    , ("@ R", "Refresh", refresh)
-                   , ("M1-;", "run or raise", runOrRaisePrompt defaultXPConfig)
+                   , ("M1-;", "run or raise", runOrRaisePrompt xpConfig)
                    -- windows
                      , ("@<", "Shrink", sendMessage Shrink)
                      , ("@>", "Shrink", sendMessage Expand)
@@ -105,6 +107,12 @@ main = do
                        , ("@ a f", "Firefox", spawn "firefox")
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
+                   -- Search
+                       , ("@ s g", "Search in Dictionary", promptSearch' xpConfig google)
+                       , ("@ s h", "Search in Dictionary", promptSearch' xpConfig hoogle)
+                       , ("@ s k", "Search in Dictionary", promptSearch' xpConfig hackage)
+                       , ("@ s w", "Search in Dictionary", promptSearch' xpConfig wikipedia)
+                       , ("@ s s", "Search in Dictionary", promptSearch' xpConfig multi)
                    -- workspaces
                        , ("@ l l", "Toggle to previous Workspace ", toggleWS)
                        , ("@ l n", "Switch to next (non-empty) workspace ", moveTo Next NonEmptyWS  )
@@ -153,3 +161,6 @@ remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
                        resetModifier (m, k) = (m .&. complement mod4Mask, k) -- 
                  in M.fromList [(mod, submap $ keys' k)]
           
+
+xpConfig = defaultXPConfig
+promptSearch' config engine = promptSearch config engine >> raise (className =? "Firefox" <||> className =? "Firefox-bin")
