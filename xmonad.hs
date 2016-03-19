@@ -91,13 +91,14 @@ main = do
                    -- global
                    , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                    , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+                   , ("@l r", "Reset layouts", setLayout =<< asks (XMonad.layoutHook  . XMonad.config ))
                    , ("@ <Space>", "Prompt", runCommand commands')
                    , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
                    , ("@ R", "Refresh", refresh)
                    , ("M1-;", "run or raise", runOrRaisePrompt xpConfig)
                    -- windows
-                     , ("@<", "Shrink", sendMessage Shrink)
-                     , ("@>", "Shrink", sendMessage Expand)
+                     , ("@S-,", "Shrink", sendMessage Shrink)
+                     , ("@S-.", "Expand", sendMessage Expand)
                      , ("@,", "Decrement master", sendMessage $ IncMasterN (-1) ) -- 
                      , ("@.", "Increment master", sendMessage $ IncMasterN 1)
                      , ("@ S", "Sink window", withFocused $ windows . W.sink)
