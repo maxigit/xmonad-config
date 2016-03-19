@@ -22,6 +22,7 @@ import XMonad.Actions.Search
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
+import XMonad.Layout.Grid
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -39,6 +40,7 @@ layout' = name "Hor" tiled
      -- ||| name "Full" Full
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
+     ||| name "Grid"  Grid
   where
     name n = renamed [Replace n]
     tiled = Tall 1 (10/100) (1/2)
@@ -81,6 +83,7 @@ main = do
         commands = [
                    -- layout
                      ("@f", "Full" , sendMessage $ ToggleLayout)
+                   , ("@S-f", "Grid" , sendMessage $ JumpToLayout "Grid")
                    , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
                    , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
