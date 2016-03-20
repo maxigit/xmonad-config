@@ -131,7 +131,7 @@ main = do
                        , ("@ l p", "Switch to previous (non-empty) workspace ", moveTo Prev NonEmptyWS  )
                        , ("@ l S-p", "Switch to previous Workspace ", prevWS )
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
-                       , ("@ p S-e", "Push to empty workspace", sendToEmptyWorkspace)
+                       , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
 		   ++ -- Workspaces operations
                    [ (key ++ show i, description ++ show i, sequence_ $ map windows (map ($show i) command))
