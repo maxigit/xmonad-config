@@ -28,7 +28,7 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.FadeInactive
 import XMonad.Util.Run(spawnPipe)
-import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap)
+import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap, mkKeymap)
 import XMonad.Util.NamedActions
 import System.IO
 import Data.Bits(complement, (.&.))
@@ -161,7 +161,8 @@ main = do
                   ]
         commands' = [(s, c) | (_,s,c) <- commands, s /= ""]
 	-- commands' = [("dummy", return ())]
-        myKeys c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
+        myKeysWithName c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
+        myKeys c = mkKeymap c [(processKey key, command) | (key, name, command) <- commands, key /= ""]
         -- (subtitle "Custom Keys":) $ mkNamedKeymap c $
         --                [ ("M1-S-;", addName "run command" $ runCommand commands') ]
         processKey ('@':k) = "M1-<Space> " ++ processKey k
@@ -170,7 +171,7 @@ main = do
         modm = mod4Mask
         confKeys = keys config
     -- xmonad $ config -- { keys = remap (mod1Mask, xK_space) confKeys  }
-    xmonad $ addDescrKeys ((modm, xK_F1), xMessage) myKeys config
+    xmonad $ config { keys = myKeys}
 
 
 remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
