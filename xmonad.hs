@@ -146,13 +146,19 @@ main = do
 -- d delete
 -- D delete all others
 			 		           ]
-			 
-                  ]
+	           ]
                   ++ -- windows operations
                   [ ("@ w " ++ show i, "Focus to " ++ show i, focusNth (i-1) )
                     | i <- [1..9]
                   ]
-
+                  ++
+                  -- screens
+                  [ (key ++ [sk], description ++ show sc, screenWorkspace sc >>= flip whenJust (windows . command)  )
+                  | (sk, sc)   <- zip "qwf" [1..]
+                  , (key, description, command) <- [("@ l ", "Swith to screen ", W.view)
+                                                   ,("@ p ", "Push to screen ", W.shift)
+                                                   ]
+                  ]
         commands' = [(s, c) | (_,s,c) <- commands, s /= ""]
 	-- commands' = [("dummy", return ())]
         myKeys c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
