@@ -22,6 +22,7 @@ import XMonad.Actions.Search
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
+import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
  
 import XMonad.Hooks.DynamicLog
@@ -41,11 +42,14 @@ layout' = name "Hor" tiled
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
      ||| name "Grid"  Grid
+     ||| name "Hor2" twoP
+     ||| name "Ver2" (Mirror twoP)
   where
     name n = renamed [Replace n]
     tiled = Tall 1 (10/100) (1/2)
     tiledG = Tall 1 (10/100) (g/(1+g))
     g= 1.61 -- Golden ratio
+    twoP = TwoPane (3/100) (1/2)
        
 main = do
     xmproc <- spawnPipe "xmobar"
@@ -62,7 +66,7 @@ main = do
                                        <+> fadeInactiveLogHook 0.8
                        , modMask = modm     -- Rebind Mod to the Windows key
 	               , borderWidth = 1
-	               , focusedBorderColor = "#ffffff"
+	               , focusedBorderColor = "#ff0000" -- "#ffffff"
 	               , normalBorderColor = "#000000"
                        } `additionalKeysP`
                        ( [ ("g", gotoMenu)
@@ -88,6 +92,8 @@ main = do
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
                    , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
                    , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
+		   , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
+		   , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
                    , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                    , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
