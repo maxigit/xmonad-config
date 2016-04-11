@@ -17,6 +17,7 @@ import XMonad.Actions.FindEmptyWorkspace
 import XMonad.Actions.FocusNth
 import XMonad.Actions.Promote
 import XMonad.Actions.Search
+import XMonad.Actions.RotSlaves
 
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
@@ -33,6 +34,7 @@ import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap, mkKeymap)
 import XMonad.Util.NamedActions
 import System.IO
 import Data.Bits(complement, (.&.))
+import Data.Char (toLower)
 
 
 layout = toggleLayouts Full layout'
@@ -115,6 +117,8 @@ main = do
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
+                     , ("@e", "Focus Previous", rotSlavesDown)
+                     , ("@S-e", "Swap Previous", rotSlavesUp)
                      , ("@S-n", "Swap next", windows W.swapUp)
                      , ("@S-m", "Swap master", windows W.swapMaster)
                      , ("@w w", "Focus Next", promote) -- windows W.focusDown)
@@ -172,6 +176,7 @@ main = do
         -- (subtitle "Custom Keys":) $ mkNamedKeymap c $
         --                [ ("M1-S-;", addName "run command" $ runCommand commands') ]
         processKey ('@':k) = "M1-<Space> " ++ processKey k
+        -- processKey ('@':k) = "C-<Space> " ++ processKey k
         processKey k = k
 
         modm = mod4Mask
@@ -185,5 +190,10 @@ remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
                  in M.fromList [(mod, submap $ keys' k)]
           
 
-xpConfig = defaultXPConfig
+xpConfig = defaultXPConfig { position = Top
+                           , font =         "xft:Bitstream Vera Sans Mono:size=12:bold:antialias=true"
+                           , searchPredicate = ignoreCase
+                           }
+  where ignoreCase p s = searchPredicate defaultXPConfig (ic p) (ic s)
+        ic = map toLower
 promptSearch' config engine = promptSearch config engine >> raise (className =? "Firefox" <||> className =? "Firefox-bin")
