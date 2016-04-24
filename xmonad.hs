@@ -25,6 +25,7 @@ import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
+import XMonad.Layout.LimitWindows
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -37,15 +38,16 @@ import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
 
 
-layout = toggleLayouts Full layout'
+-- layout = toggleLayouts Full layout'
+layout = toggleLayouts Full $ limitSlice 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
      ||| name "Grid"  Grid
-     ||| name "Hor2" twoP
-     ||| name "Ver2" (Mirror twoP)
+     -- ||| name "Hor2" twoP
+     -- ||| name "Ver2" (Mirror twoP)
   where
     name n = renamed [Replace n]
     tiled = Tall 1 (10/100) (1/2)
@@ -94,8 +96,14 @@ main = do
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
                    , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
                    , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
-		   , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
-		   , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
+		   -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
+		   , ("@1", "Full Screen", setLimit 1)
+		   , ("@2", "Two Panes Limit", setLimit 2)
+		   , ("@3", "Three Panes Layout", setLimit 3)
+		   , ("@6", "Two Pane Layout", setLimit 6)
+		   , ("@4", "Decrease limit", decreaseLimit)
+		   , ("@7", "Increase limit", increaseLimit)
+		   -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
                    , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                    , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
@@ -175,8 +183,11 @@ main = do
         myKeys c = mkKeymap c [(processKey key, command) | (key, name, command) <- commands, key /= ""]
         -- (subtitle "Custom Keys":) $ mkNamedKeymap c $
         --                [ ("M1-S-;", addName "run command" $ runCommand commands') ]
+    
+        -- There
         processKey ('@':k) = "M1-<Space> " ++ processKey k
         -- processKey ('@':k) = "C-<Space> " ++ processKey k
+
         processKey k = k
 
         modm = mod4Mask
