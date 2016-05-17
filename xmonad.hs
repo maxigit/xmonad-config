@@ -112,6 +112,7 @@ main = do
                    , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
                    , ("@ R", "Refresh", refresh)
                    , ("M1-;", "run or raise", runOrRaisePrompt xpConfig)
+                   , ("@ a a", "run or raise", runOrRaisePrompt xpConfig)
                    -- windows
                      , ("@S-,", "Shrink", sendMessage Shrink)
                      , ("@S-.", "Expand", sendMessage Expand)
@@ -131,10 +132,11 @@ main = do
                      , ("@S-m", "Swap master", windows W.swapMaster)
                      , ("@w w", "Focus Next", promote) -- windows W.focusDown)
                    -- applications
-                       , ("@ a t", "terminal", spawn =<< asks (terminal . XMonad.config))
+                       , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "firefox")
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
+                       , ("@ a n", "nautilus", spawn "nautilus")
                    -- Search
                        , ("@ s g", "Search in Dictionary", promptSearch' xpConfig google)
                        , ("@ s h", "Search in Dictionary", promptSearch' xpConfig hoogle)
