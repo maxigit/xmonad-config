@@ -1,0 +1,2 @@
+recompile:
+	xmonad --recompile
