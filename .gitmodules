@@ -1,0 +1,3 @@
+[submodule "xmobar"]
+	path = xmobar
+	url = git://github.com/jaor/xmobar
