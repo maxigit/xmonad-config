@@ -107,6 +107,7 @@ main = do
                    -- global
                    , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                    , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+                   , ("@q t", "Toggle Struts", sendMessage ToggleStruts ) -- workaround xmobar not showing on screen1
                    , ("@l r", "Reset layouts", setLayout =<< asks (XMonad.layoutHook  . XMonad.config ))
                    , ("@ <Space>", "Prompt", runCommand commands')
                    , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
@@ -187,8 +188,8 @@ main = do
         --                [ ("M1-S-;", addName "run command" $ runCommand commands') ]
     
         -- There
-        processKey ('@':k) = "M1-<Space> " ++ processKey k
-        -- processKey ('@':k) = "C-<Space> " ++ processKey k
+        -- processKey ('@':k) = "M1-<Space> " ++ processKey k
+        processKey ('@':k) = "C-<Space> " ++ processKey k
 
         processKey k = k
 
