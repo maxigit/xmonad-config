@@ -58,8 +58,8 @@ layout' = name "Hor" tiled
 main = do
     xmproc <- spawnPipe "xmobar"
 
-    let config =  defaultConfig
-                       { manageHook = manageDocks <+> manageHook defaultConfig
+    let config =  docks $ defaultConfig
+                       { manageHook = manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
