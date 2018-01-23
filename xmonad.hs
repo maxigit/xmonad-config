@@ -26,6 +26,7 @@ import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
 import XMonad.Layout.LimitWindows
+import XMonad.Layout.NoBorders
  
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -39,7 +40,7 @@ import Data.Char (toLower)
 
 
 -- layout = toggleLayouts Full layout'
-layout = toggleLayouts Full $ limitSlice 6 layout'
+layout = toggleLayouts (noBorders Full) $ limitSlice 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
@@ -49,7 +50,7 @@ layout' = name "Hor" tiled
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
-    name n = renamed [Replace n]
+    name n = renamed [Replace n] . smartBorders
     tiled = Tall 1 (10/100) (1/2)
     tiledG = Tall 1 (10/100) (g/(1+g))
     g= 1.61 -- Golden ratio
