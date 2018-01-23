@@ -129,7 +129,7 @@ main = do
                      , ("@S-.", "Expand", sendMessage Expand)
                      , ("@,", "Decrement master", sendMessage $ IncMasterN (-1) ) -- 
                      , ("@.", "Increment master", sendMessage $ IncMasterN 1)
-                     , ("@ S", "Sink window", withFocused $ windows . W.sink)
+                     , ("@S-s", "Sink window", withFocused $ windows . W.sink)
                      , ("@ g", "Goto window", gotoMenu )
                      , ("@ b", "Goto window", bringMenu )
                      , ("@ d", "Delete window", kill1 )
@@ -187,6 +187,7 @@ main = do
 					            , ("@ S-p ", "Push ", [W.shift])
 			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
 			 	                    , ("@ S-t ", "Put ", [copy])
+			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
 			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
 -- d delete
 -- D delete all others
