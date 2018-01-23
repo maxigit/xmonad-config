@@ -25,6 +25,7 @@ import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
+import XMonad.Layout.Tabbed
 import XMonad.Layout.Dishes
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
@@ -40,9 +41,11 @@ import System.IO
 import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
 
+import XMonad.Util.Themes
 
 -- layout = toggleLayouts Full layout'
-layout = toggleLayouts (noBorders Full) $ limitWindows 6 layout'
+full = simpleTabbed
+layout = toggleLayouts (noBorders full) $ limitWindows 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
@@ -106,7 +109,7 @@ main = do
         -- @ will be replace by the "leader"
         commands = [
                    -- layout
-                     ("@f", "Full" , sendMessage $ ToggleLayout)
+                     ("@f", "Full" , (sendMessage $ ToggleLayout) >> sendMessage ToggleStruts)
                    , ("@S-f", "Grid" , sendMessage $ JumpToLayout "Grid")
                    , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
