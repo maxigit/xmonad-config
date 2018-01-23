@@ -118,7 +118,7 @@ main = do
                    , ("@l r", "Reset layouts", setLayout =<< asks (XMonad.layoutHook  . XMonad.config ))
                    , ("@ <Space>", "Prompt", runCommand commands')
                    , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
-                   , ("@ R", "Refresh", refresh)
+                   , ("@S-r", "Refresh", refresh)
                    , ("M1-;", "run or raise", runOrRaisePrompt xpConfig)
                    , ("@ a a", "run or raise", runOrRaisePrompt xpConfig)
                    -- windows
@@ -130,7 +130,7 @@ main = do
                      , ("@ g", "Goto window", gotoMenu )
                      , ("@ b", "Goto window", bringMenu )
                      , ("@ d", "Delete window", kill1 )
-                     , ("@ D", "Delete all copy window", kill1 )
+                     , ("@S-d", "Delete all copy window", killAllOtherCopies )
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
