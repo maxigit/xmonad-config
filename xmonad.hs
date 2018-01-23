@@ -25,6 +25,7 @@ import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
+import XMonad.Layout.Dishes
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
  
@@ -51,12 +52,13 @@ layout' = name "Hor" tiled
      -- ||| name "Ver2" (Mirror twoP)
   where
     name n = renamed [Replace n] . smartBorders
-    tiled = Tall 1 (10/100) (1/2)
-    tiledG = Tall 1 (10/100) (g/(1+g))
+    -- tiledG = Tall 1 (10/100) (1/2)
+    tiled = Dishes 2 (10/100)
+    tiledG = Tall 1 (5/100) (9/10) -- (g/(1+g))
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
        
-extraWs = "abcdfghijkmorstuvxyz"
+extraWs = "abcdfghijkmostuvxyz"
 
 myXmobarHook xmproc =  do
   -- workspace containing the focused window
