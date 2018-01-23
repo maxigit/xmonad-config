@@ -40,7 +40,7 @@ import Data.Char (toLower)
 
 
 -- layout = toggleLayouts Full layout'
-layout = toggleLayouts (noBorders Full) $ limitSlice 6 layout'
+layout = toggleLayouts (noBorders Full) $ limitWindows 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
