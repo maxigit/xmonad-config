@@ -202,8 +202,10 @@ main = do
 			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
 			 	                    , ("@ S-t ", "Put ", [copy])
 			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
-                                                    , ("@ t S-", "Put all", [copyAll, W.greedyView])
-                                                    , ("@ p S-", "Push all", [copyAll])
+                                                    , ("@ t S-", "Put all and go", [copyAll, W.greedyView])
+                                                    , ("@ S-t S-", "Put all", [copyAll])
+                                                    , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
+                                                    , ("@ S-p S-", "Push all", [shiftAll])
 -- d delete
 -- D delete all others
 			 		           ]
@@ -259,6 +261,10 @@ copyAll i stackset = let
   actions = [copyWindow w i | w <- ws]
   in foldr ($) stackset actions
   
+shiftAll i stackset = let
+  ws = W.index stackset
+  actions = [W.shiftWin i w | w <- ws]
+  in foldr ($) stackset actions
   
   
 
