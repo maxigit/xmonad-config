@@ -188,7 +188,8 @@ main = do
 			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
 			 	                    , ("@ S-t ", "Put ", [copy])
 			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
-			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
+                                                    , ("@ t S-", "Put all", [copyAll, W.greedyView])
+                                                    , ("@ p S-", "Push all", [copyAll])
 -- d delete
 -- D delete all others
 			 		           ]
@@ -236,3 +237,14 @@ xpConfig = defaultXPConfig { position = Top
   where ignoreCase p s = searchPredicate defaultXPConfig (ic p) (ic s)
         ic = map toLower
 promptSearch' config engine = promptSearch config engine >> raise (className =? "Firefox" <||> className =? "Firefox-bin")
+
+
+copyAll:: (Eq s, Eq i, Eq a) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
+copyAll i stackset = let
+  ws = W.index stackset
+  actions = [copyWindow w i | w <- ws]
+  in foldr ($) stackset actions
+  
+  
+  
+
