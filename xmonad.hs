@@ -26,6 +26,7 @@ import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
 import XMonad.Layout.Dishes
+import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
  
@@ -48,6 +49,7 @@ layout' = name "Hor" tiled
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
      ||| name "Grid"  Grid
+     ||| name "Dwindle" (Dwindle R CW 1.5 1.1)
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
@@ -95,8 +97,9 @@ main = do
                          , ("v", sendMessage $ JumpToLayout "Ver")
                          , ("S-h", sendMessage $ JumpToLayout "HorG")
                          , ("S-v", sendMessage $ JumpToLayout "VerG")
+                         , ("c", sendMessage $ JumpToLayout "Dwindle")
                          ] 
-                       ++ [("c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
+                       -- ++ [("c " ++ show i, windows $ copy (show i)) | i <- [1..9]]
                        )
         -- list of command and keymap. the command name will be used as a name (for documentation)
         -- as well as identifier to be ran via dmenu
@@ -109,6 +112,7 @@ main = do
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
                    , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
                    , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
+                   , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
 		   -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
 		   , ("@1", "Full Screen", setLimit 1)
 		   , ("@2", "Two Panes Limit", setLimit 2)
