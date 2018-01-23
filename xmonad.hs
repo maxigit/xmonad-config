@@ -77,7 +77,7 @@ main = do
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
-                       , logHook = myXmobarHook xmproc <+> fadeInactiveLogHook 0.8
+                       , logHook = myXmobarHook xmproc <+> fadeInactiveLogHook 0.85
                        , modMask = modm     -- Rebind Mod to the Windows key
 	               , borderWidth = 1
 	               , focusedBorderColor = "#ff0000" -- "#ffffff"
@@ -143,6 +143,10 @@ main = do
                      , ("@S-n", "Swap next", windows W.swapUp)
                      , ("@S-m", "Swap master", windows W.swapMaster)
                      , ("@w w", "Focus Next", promote) -- windows W.focusDown)
+                   -- toggle transparency
+                       , ("@ u", "transparency", spawn "xcompmgr") -- =<< asks (terminal . XMonad.config))
+                       , ("@ S-u", "no transparency", spawn "killall xcompmgr") -- =<< asks (terminal . XMonad.config))
+                    
                    -- applications
                        , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "firefox")
