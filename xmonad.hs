@@ -62,7 +62,7 @@ myXmobarHook xmproc =  do
   -- workspace containing the focused window
   copies <- wsContainingCopies
   -- print in red workspace containing a copy of the focuse window
-  let checkTag ws | ws `elem` copies = pad . xmobarColor "red" "black" $ ws 
+  let checkTag ws | ws `elem` copies = xmobarColor "orange" "black" $ pad ws 
                   | otherwise = pad ws
   dynamicLogWithPP xmobarPP
         { ppOutput = hPutStrLn xmproc
