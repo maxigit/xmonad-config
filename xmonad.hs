@@ -55,6 +55,17 @@ layout' = name "Hor" tiled
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
        
+myXmobarHook xmproc =  do
+  -- workspace containing the focused window
+  copies <- wsContainingCopies
+  -- print in red workspace containing a copy of the focuse window
+  let checkTag ws | ws `elem` copies = pad . xmobarColor "red" "black" $ ws 
+                  | otherwise = pad ws
+  dynamicLogWithPP xmobarPP
+        { ppOutput = hPutStrLn xmproc
+        , ppTitle = xmobarColor "green" "" . shorten 50
+        , ppHidden = checkTag
+        }
 main = do
     xmproc <- spawnPipe "xmobar"
 
@@ -63,11 +74,7 @@ main = do
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
-                       , logHook = dynamicLogWithPP xmobarPP
-                                       { ppOutput = hPutStrLn xmproc
-                                       , ppTitle = xmobarColor "green" "" . shorten 50
-                                       }
-                                       <+> fadeInactiveLogHook 0.8
+                       , logHook = myXmobarHook xmproc <+> fadeInactiveLogHook 0.8
                        , modMask = modm     -- Rebind Mod to the Windows key
 	               , borderWidth = 1
 	               , focusedBorderColor = "#ff0000" -- "#ffffff"
