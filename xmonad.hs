@@ -55,6 +55,8 @@ layout' = name "Hor" tiled
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
        
+extraWs = "abcdfghijkmorstuvxyz"
+
 myXmobarHook xmproc =  do
   -- workspace containing the focused window
   copies <- wsContainingCopies
@@ -79,6 +81,7 @@ main = do
 	               , borderWidth = 1
 	               , focusedBorderColor = "#ff0000" -- "#ffffff"
 	               , normalBorderColor = "#000000"
+                       , workspaces = map show [1..9] ++ map return extraWs
                        } `additionalKeysP`
                        ( [ ("g", gotoMenu)
                          , ("b", bringMenu)
@@ -167,6 +170,20 @@ main = do
 		   , (key, description, command) <- [ ("M1-",  "Switch to ", [W.greedyView])
 					            , ("@ l ", "Layer ", [W.greedyView])
 					            , ("M1-S-", "Shift (push) ", [W.shift])
+					            , ("@ S-p ", "Push ", [W.shift])
+			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
+			 	                    , ("@ S-t ", "Put ", [copy])
+			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
+-- d delete
+-- D delete all others
+			 		           ]
+	           ]
+		   ++ -- Workspaces operations
+                   [ (key ++ [c], description ++ [c], sequence_ $ map windows (map ($ [c]) command))
+                   | c <- extraWs :: [Char]
+		   , (key, description, command) <- [ -- ("M1-",  "Switch to ", [W.greedyView])
+					             ("@ l ", "Layer ", [W.greedyView])
+					            -- , ("M1-S-", "Shift (push) ", [W.shift])
 					            , ("@ S-p ", "Push ", [W.shift])
 			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
 			 	                    , ("@ S-t ", "Put ", [copy])
