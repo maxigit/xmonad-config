@@ -142,6 +142,9 @@ main = do
                      , ("@.", "Increment master", sendMessage $ IncMasterN 1)
                      , ("@S-s s", "Sink window", withFocused $ windows . W.sink)
                      , ("@S-s c", "Float window center", withFocused $ windows . flip W.float centerR )
+                     , ("@S-s S-c", "Float window center", withFocused $ windows . flip W.float bigCenterR )
+                     , ("@S-s h", "Float window center", withFocused $ windows . flip W.float leftR )
+                     , ("@S-s i", "Float window center", withFocused $ windows . flip W.float rightR )
                      , ("@ g", "Goto window", gotoMenu )
                      , ("@ b", "Goto window", bringMenu )
                      , ("@ d", "Delete window", kill1 )
@@ -273,3 +276,6 @@ shiftAll i stackset = let
 killAll = withAll (\w -> do (focus w) >> kill1)
 
 centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
+bigCenterR = W.RationalRect (1/8) (1/8) (3/4) (3/4)
+leftR = W.RationalRect (0) (1/8) (1/2) (3/4)
+rightR = W.RationalRect (4/8) (1/8) (1/2) (3/4)
