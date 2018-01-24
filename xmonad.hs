@@ -18,6 +18,7 @@ import XMonad.Actions.FocusNth
 import XMonad.Actions.Promote
 import XMonad.Actions.Search
 import XMonad.Actions.RotSlaves
+import XMonad.Actions.WithAll hiding (killAll)
 
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
@@ -143,7 +144,9 @@ main = do
                      , ("@ g", "Goto window", gotoMenu )
                      , ("@ b", "Goto window", bringMenu )
                      , ("@ d", "Delete window", kill1 )
-                     , ("@S-d", "Delete all copy window", killAllOtherCopies )
+                     , ("@S-d d", "Delete all copy window", killAllOtherCopies )
+                     , ("@S-d S-d", "Delete all workspace windows", killAll)
+                     , ("@S-d w", "Delete all workspace windows", killAll >> moveTo Prev NonEmptyWS)
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
@@ -266,5 +269,4 @@ shiftAll i stackset = let
   actions = [W.shiftWin i w | w <- ws]
   in foldr ($) stackset actions
   
-  
-
+killAll = withAll (\w -> do (focus w) >> kill1)
