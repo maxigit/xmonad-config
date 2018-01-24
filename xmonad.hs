@@ -140,7 +140,8 @@ main = do
                      , ("@S-.", "Expand", sendMessage Expand)
                      , ("@,", "Decrement master", sendMessage $ IncMasterN (-1) ) -- 
                      , ("@.", "Increment master", sendMessage $ IncMasterN 1)
-                     , ("@S-s", "Sink window", withFocused $ windows . W.sink)
+                     , ("@S-s s", "Sink window", withFocused $ windows . W.sink)
+                     , ("@S-s c", "Float window center", withFocused $ windows . flip W.float centerR )
                      , ("@ g", "Goto window", gotoMenu )
                      , ("@ b", "Goto window", bringMenu )
                      , ("@ d", "Delete window", kill1 )
@@ -270,3 +271,5 @@ shiftAll i stackset = let
   in foldr ($) stackset actions
   
 killAll = withAll (\w -> do (focus w) >> kill1)
+
+centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
