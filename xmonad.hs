@@ -80,8 +80,8 @@ myXmobarHook xmproc =  do
 main = do
     xmproc <- spawnPipe "xmobar"
 
-    let config =  defaultConfig
-                       { manageHook = manageDocks <+> manageHook defaultConfig
+    let config =  docks $ defaultConfig
+                       { manageHook = manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
@@ -164,7 +164,7 @@ main = do
                        , ("@ S-u", "no transparency", spawn "killall xcompmgr") -- =<< asks (terminal . XMonad.config))
                     
                    -- applications
-                       , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
+                       , ("@ a t", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "firefox")
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
