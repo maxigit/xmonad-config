@@ -64,7 +64,7 @@ layout' = name "Hor" tiled
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
        
-extraWs = "abcdfghijkmostuvxyz"
+extraWs = "abcdghijkmostuvxyz"
 
 myXmobarHook xmproc =  do
   -- workspace containing the focused window
@@ -224,7 +224,7 @@ main = do
                   ++
                   -- screens
                   [ (key ++ [sk], description ++ show sc, screenWorkspace sc >>= flip whenJust (windows . command)  )
-                  | (sk, sc)   <- zip "qwf" [1..]
+                  | (sk, sc)   <- zip "qwf" [0..]
                   , (key, description, command) <- [("@ l ", "Swith to screen ", W.view)
                                                    ,("@ p ", "Push to screen ", W.shift)
                                                    ]
