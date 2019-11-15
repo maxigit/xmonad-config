@@ -70,7 +70,7 @@ layout' = name "Hor" tiled
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
        
-extraWs = "abcdfghijkmostuvxyz"
+extraWs = "abcdghijkmostuvxyz"
 
 myXmobarHook xmproc =  do
   -- workspace containing the focused window
@@ -86,8 +86,8 @@ myXmobarHook xmproc =  do
 main = do
     xmproc <- spawnPipe "xmobar"
 
-    let config =  defaultConfig
-                       { manageHook = manageDocks <+> manageHook defaultConfig
+    let config =  docks $ defaultConfig
+                       { manageHook = manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
@@ -170,7 +170,7 @@ main = do
                        , ("@ S-u", "no transparency", spawn "killall xcompmgr") -- =<< asks (terminal . XMonad.config))
                     
                    -- applications
-                       , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
+                       , ("@ a t", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "firefox")
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
@@ -230,7 +230,7 @@ main = do
                   ++
                   -- screens
                   [ (key ++ [sk], description ++ show sc, screenWorkspace sc >>= flip whenJust (windows . command)  )
-                  | (sk, sc)   <- zip "qwf" [1..]
+                  | (sk, sc)   <- zip "qwf" [0..]
                   , (key, description, command) <- [("@ l ", "Swith to screen ", W.view)
                                                    ,("@ p ", "Push to screen ", W.shift)
                                                    ]
