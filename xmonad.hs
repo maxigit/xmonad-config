@@ -45,7 +45,13 @@ import Data.Char (toLower)
 import XMonad.Util.Themes
 
 -- layout = toggleLayouts Full layout'
-full = simpleTabbed
+full = tabbedBottom shrinkText def { activeColor         = "#115422"
+                                      , activeBorderColor   = "#1a8033"
+                                      , activeTextColor     = "white"
+                                      , inactiveColor       = "#543211"
+                                      , inactiveBorderColor = "#804c19"
+                                      , inactiveTextColor   = "#ffcc33"
+                                      }
 layout = toggleLayouts (noBorders full) $ limitWindows 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
@@ -110,7 +116,7 @@ main = do
         -- @ will be replace by the "leader"
         commands = [
                    -- layout
-                     ("@f", "Full" , (sendMessage $ ToggleLayout) >> sendMessage ToggleStruts)
+                     ("@f", "Full" , (sendMessage $ ToggleLayout)) -- >> sendMessage ToggleStruts)
                    , ("@S-f", "Grid" , sendMessage $ JumpToLayout "Grid")
                    , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
                    , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
