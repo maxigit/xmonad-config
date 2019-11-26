@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 import XMonad hiding((|||))
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
@@ -43,7 +44,9 @@ import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
 
 import XMonad.Util.Themes
-
+import qualified DBus as D
+import qualified DBus.Client as D
+import qualified Codec.Binary.UTF8.String as UTF8
 -- layout = toggleLayouts Full layout'
 full = tabbedBottom shrinkText def { activeColor         = "#115422"
                                       , activeBorderColor   = "#1a8033"
@@ -83,15 +86,32 @@ myXmobarHook xmproc =  do
         , ppTitle = xmobarColor "green" "" . shorten 50
         , ppHidden = checkTag
         }
+
+myDBusHook dbus =  do
+  -- workspace containing the focused window
+  copies <- wsContainingCopies
+  -- print in red workspace containing a copy of the focuse window
+  let checkTag ws | ws `elem` copies = pangoColor "orange" $ pad ws
+                  | otherwise = pad ws
+  dynamicLogWithPP $ (defaultPP)
+    { ppOutput   = dbusOutput dbus
+    , ppTitle    = pangoSanitize
+    , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
+    , ppVisible  = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
+   , ppHidden = checkTag
+   , ppLayout = pangoColor "darkred"
+  }
 main = do
-    xmproc <- spawnPipe "xmobar"
+  -- xmproc <- spawnPipe "xmobar"
+    dbus <- D.connectSession
+    getWellKnownName dbus
 
     let config =  docks $ defaultConfig
                        { manageHook = manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
-                       , logHook = myXmobarHook xmproc <+> fadeInactiveLogHook 0.85
+                       , logHook = myDBusHook dbus <+> fadeInactiveLogHook 0.85
                        , modMask = modm     -- Rebind Mod to the Windows key
 	               , borderWidth = 1
 	               , focusedBorderColor = "#ff0000" -- "#ffffff"
@@ -285,3 +305,46 @@ centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
 bigCenterR = W.RationalRect (1/8) (1/8) (3/4) (3/4)
 leftR = W.RationalRect (0) (1/8) (1/2) (3/4)
 rightR = W.RationalRect (4/8) (1/8) (1/2) (3/4)
+
+
+
+-- from xmonad-log-applet
+-- prettyPrinter :: D.Client -> PP
+prettyPrinter dbus = defaultPP
+    { ppOutput   = dbusOutput dbus
+    , ppTitle    = pangoSanitize
+    , ppCurrent  = pangoColor "green" . wrap "[" "]" . pangoSanitize
+    , ppVisible  = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
+    , ppHidden   = const ""
+    , ppUrgent   = pangoColor "red"
+    -- , ppLayout   = const ""
+    , ppSep      = " "
+    }
+
+getWellKnownName :: D.Client -> IO ()
+getWellKnownName dbus = do
+  D.requestName dbus (D.busName_ "org.xmonad.Log")
+                [D.nameAllowReplacement, D.nameReplaceExisting, D.nameDoNotQueue]
+  return ()
+
+dbusOutput :: D.Client -> String -> IO ()
+dbusOutput dbus str = do
+    let signal = (D.signal "/org/xmonad/Log" "org.xmonad.Log" "Update") {
+            D.signalBody = [D.toVariant ("<b>" ++ (UTF8.decodeString str) ++ "</b>")]
+        }
+    D.emit dbus signal
+
+pangoColor :: String -> String -> String
+pangoColor fg = wrap left right
+  where
+    left  = "<span foreground=\"" ++ fg ++ "\">"
+    right = "</span>"
+
+pangoSanitize :: String -> String
+pangoSanitize = foldr sanitize ""
+  where
+    sanitize '>'  xs = "&gt;" ++ xs
+    sanitize '<'  xs = "&lt;" ++ xs
+    sanitize '\"' xs = "&quot;" ++ xs
+    sanitize '&'  xs = "&amp;" ++ xs
+    sanitize x    xs = x:xs
