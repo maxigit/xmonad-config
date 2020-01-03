@@ -44,18 +44,20 @@ import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
 
 import XMonad.Util.Themes
+import XMonad.Util.Themes
 import qualified DBus as D
 import qualified DBus.Client as D
 import qualified Codec.Binary.UTF8.String as UTF8
 -- layout = toggleLayouts Full layout'
-full = tabbedBottom shrinkText def { activeColor         = "#115422"
-                                      , activeBorderColor   = "#1a8033"
-                                      , activeTextColor     = "white"
-                                      , inactiveColor       = "#543211"
-                                      , inactiveBorderColor = "#804c19"
-                                      , inactiveTextColor   = "#ffcc33"
-                                      }
-layout = toggleLayouts (noBorders full) $ limitWindows 6 layout'
+-- full = tabbedBottom shrinkText def { activeColor         = "#115422"
+--                                       , activeBorderColor   = "#1a8033"
+--                                       , activeTextColor     = "white"
+--                                       , inactiveColor       = "#543211"
+--                                       , inactiveBorderColor = "#804c19"
+--                                       , inactiveTextColor   = "#ffcc33"
+--                                       , fontName = ""
+--                                       }
+layout = toggleLayouts (noBorders Full) $ limitSlice 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
@@ -97,7 +99,7 @@ myDBusHook dbus =  do
     { ppOutput   = dbusOutput dbus
     , ppTitle    = pangoSanitize
     , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
-    , ppVisible  = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
+    , ppVisible  = pangoColor "green" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
    , ppLayout = pangoColor "darkred"
   }
@@ -147,8 +149,9 @@ main = do
 		   , ("@1", "Full Screen", setLimit 1)
 		   , ("@2", "Two Panes Limit", setLimit 2)
 		   , ("@3", "Three Panes Layout", setLimit 3)
+		   , ("@4", "Four Panes Layout", setLimit 4)
+		   , ("@5", "Decrease limit", decreaseLimit)
 		   , ("@6", "Two Pane Layout", setLimit 6)
-		   , ("@4", "Decrease limit", decreaseLimit)
 		   , ("@7", "Increase limit", increaseLimit)
 		   -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
@@ -190,7 +193,8 @@ main = do
                        , ("@ S-u", "no transparency", spawn "killall xcompmgr") -- =<< asks (terminal . XMonad.config))
                     
                    -- applications
-                       , ("@ a t", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
+                       , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
+                       , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "firefox")
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
