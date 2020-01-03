@@ -259,6 +259,15 @@ main = do
                                                    ,("@ p ", "Push to screen ", W.shift)
                                                    ]
                   ]
+                  ++ -- switch screan
+                  [ ("@ S-w", "Next Screen", do
+                             wset <- gets windowset
+                             case W.visible wset of
+                                [] -> return ()
+                                (nextScreen:_) -> do
+                                   screenWorkspace (W.screen nextScreen) >>= flip whenJust (windows . W.view)
+                    )
+                  ]
         commands' = [(s, c) | (_,s,c) <- commands, s /= ""]
 	-- commands' = [("dummy", return ())]
         myKeysWithName c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
