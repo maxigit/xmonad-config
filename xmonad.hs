@@ -115,9 +115,9 @@ main = do
                        , layoutHook = avoidStruts layout
                        , logHook = myDBusHook dbus <+> fadeInactiveLogHook 0.85
                        , modMask = modm     -- Rebind Mod to the Windows key
-	               , borderWidth = 1
-	               , focusedBorderColor = "#ff0000" -- "#ffffff"
-	               , normalBorderColor = "#000000"
+                       , borderWidth = 1
+                       , focusedBorderColor = "#ff0000" -- "#ffffff"
+                       , normalBorderColor = "#000000"
                        , workspaces = map show [1..9] ++ map return extraWs
                        } `additionalKeysP`
                        ( [ ("g", gotoMenu)
@@ -226,6 +226,12 @@ main = do
 			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
 			 	                    , ("@ S-t ", "Put ", [copy])
 			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
+                                                    , ("@ t S-", "Put all and go", [copyAll, W.greedyView])
+                                                    , ("@ S-t S-", "Put all", [copyAll])
+                                                    , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
+                                                    , ("@ S-p S-", "Push all", [shiftAll])
+                                                    , ("@ o ", "Swap all", [swapAll])
+                                                    , ("@ S-o ", "Swap all", [swapAll, W.greedyView])
 -- d delete
 -- D delete all others
 			 		           ]
@@ -244,6 +250,8 @@ main = do
                                                     , ("@ S-t S-", "Put all", [copyAll])
                                                     , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
                                                     , ("@ S-p S-", "Push all", [shiftAll])
+                                                    , ("@ o ", "Swap all", [swapAll])
+                                                    , ("@ S-o ", "Swap all", [swapAll, W.greedyView])
 -- d delete
 -- D delete all others
 			 		           ]
@@ -302,15 +310,27 @@ xpConfig = defaultXPConfig { position = Top
 promptSearch' config engine = promptSearch config engine >> raise (className =? "Firefox" <||> className =? "Firefox-bin")
 
 
+-- copy all windows of the current workspace to the target WS
 copyAll:: (Eq s, Eq i, Eq a) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
 copyAll i stackset = let
   ws = W.index stackset
   actions = [copyWindow w i | w <- ws]
   in foldr ($) stackset actions
   
+-- move all current windows to the  target WS
 shiftAll i stackset = let
   ws = W.index stackset
   actions = [W.shiftWin i w | w <- ws]
+  in foldr ($) stackset actions
+
+
+-- swap windows between current and target WS
+swapAll i stackset = let
+  currentWindows = W.index stackset
+  currentTag = W.currentTag stackset
+  targetWindows = W.index (W.greedyView i stackset)
+  actions = [W.shiftWin i w | w <- currentWindows]
+            <> [W.shiftWin currentTag w | w <- targetWindows]
   in foldr ($) stackset actions
   
 killAll = withAll (\w -> do (focus w) >> kill1)
