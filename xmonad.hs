@@ -118,7 +118,10 @@ main = do
                        , borderWidth = 1
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
                        , normalBorderColor = "#000000"
-                       , workspaces = map show [1..9] ++ map return extraWs
+                       , workspaces = [ p <> ws
+                                      | ws <- map show [1..9] ++ map return extraWs
+                                      , p <- "" : map show [1..9]
+                                      ]
                        } `additionalKeysP`
                        ( [ ("g", gotoMenu)
                          , ("b", bringMenu)
@@ -231,7 +234,9 @@ main = do
                                                     , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
                                                     , ("@ S-p S-", "Push all", [shiftAll])
                                                     , ("@ o ", "Swap all", [swapAll])
-                                                    , ("@ S-o ", "Swap all", [swapAll, W.greedyView])
+                                                    , ("@ S-o ", "Swap all and go", [swapAll, W.greedyView])
+                                                    , ("@ i ", "Swap all, local", [swapAll'])
+                                                    , ("@ S-i ", "Swap all and go, local", [swapAll' , W.greedyView])
 -- d delete
 -- D delete all others
 			 		           ]
@@ -251,7 +256,9 @@ main = do
                                                     , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
                                                     , ("@ S-p S-", "Push all", [shiftAll])
                                                     , ("@ o ", "Swap all", [swapAll])
-                                                    , ("@ S-o ", "Swap all", [swapAll, W.greedyView])
+                                                    , ("@ S-o ", "Swap all and go", [swapAll, W.greedyView])
+                                                    , ("@ i ", "Swap all, local", [swapAll'])
+                                                    , ("@ S-i ", "Swap all and go, local", [swapAll' , W.greedyView])
 -- d delete
 -- D delete all others
 			 		           ]
@@ -333,6 +340,17 @@ swapAll i stackset = let
             <> [W.shiftWin currentTag w | w <- targetWindows]
   in foldr ($) stackset actions
   
+-- like swapAll but use local WS (ie double letter
+-- starting with first ones
+swapAll' i0 stackset = let
+  (c:_) = W.currentTag stackset
+  i = case i0 of
+      [x] | x `elem` ['1'..'9'] -> [x]
+      (_:x:xs) -> c:x:xs -- drop first one if neede
+      xs -> c:xs
+  -- in swapAll (c : i) stackset
+  in swapAll i stackset
+  -- in swapAll i0 stackset
 killAll = withAll (\w -> do (focus w) >> kill1)
 
 centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
