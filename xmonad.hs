@@ -115,9 +115,9 @@ main = do
                        , layoutHook = avoidStruts layout
                        , logHook = myDBusHook dbus <+> fadeInactiveLogHook 0.85
                        , modMask = modm     -- Rebind Mod to the Windows key
-                       , borderWidth = 1
+                       , borderWidth = 2
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
-                       , normalBorderColor = "#000000"
+                       , normalBorderColor = "#0000"
                        , workspaces = [ p <> ws
                                       | ws <- map show [1..9] ++ map return extraWs
                                       , p <- "" : map show [1..9]
