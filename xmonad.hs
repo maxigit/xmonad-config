@@ -28,7 +28,7 @@ import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
 import XMonad.Layout.Tabbed
-import XMonad.Layout.Dishes
+-- import XMonad.Layout.Dishes
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
@@ -69,8 +69,8 @@ layout' = name "Hor" tiled
      -- ||| name "Ver2" (Mirror twoP)
   where
     name n = renamed [Replace n] . smartBorders
-    -- tiledG = Tall 1 (10/100) (1/2)
-    tiled = Dishes 2 (10/100)
+    tiled = Tall 2 (10/100) (1/2)
+    -- tiled = Dishes 2 (10/100)
     tiledG = Tall 1 (5/100) (9/10) -- (g/(1+g))
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
