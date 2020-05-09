@@ -284,7 +284,7 @@ main = do
                                    screenWorkspace (W.screen nextScreen) >>= flip whenJust (windows . W.view)
                     )
                   ]
-        commands' = [(s, c) | (_,s,c) <- commands, s /= ""]
+        commands' = [(s ++ " [" ++ k++ "] " , c) | (k,s,c) <- commands, s /= ""]
 	-- commands' = [("dummy", return ())]
         myKeysWithName c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
         myKeys c = mkKeymap c [(processKey key, command) | (key, name, command) <- commands, key /= ""]
