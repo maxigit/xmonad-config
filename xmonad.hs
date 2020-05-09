@@ -179,7 +179,7 @@ main = do
                      , ("@S-s i", "Float window center", withFocused $ windows . flip W.float rightR )
                      , ("@ S-g", "Goto window", gotoMenu )
                      , ("@ S-b", "Bring window", bringMenu )
-                     , ("@ b", "Bring window next", actionMenu def (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ bringWindow w s))
+                     , ("@ b", "Bring window next", actionMenu def (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
                      , ("@ g", "Master window", actionMenu def (\w s -> W.shiftMaster $ W.focusWindow w s))
                      , ("@ d", "Delete window", kill1 )
                      , ("@S-d d", "Delete all copy window", killAllOtherCopies )
