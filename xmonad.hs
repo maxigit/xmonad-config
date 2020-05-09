@@ -191,7 +191,7 @@ main = do
                      , ("@e", "Focus Previous", rotSlavesDown)
                      , ("@S-e", "Swap Previous", rotSlavesUp)
                      , ("@S-n", "Swap next", windows W.swapUp)
-                     , ("@S-m", "Swap master", windows W.swapMaster)
+                     , ("@S-m", "Swap master", windows swapMasterOrShift)
                      , ("@w w", "Focus Next", promote) -- windows W.focusDown)
                    -- toggle transparency
                        , ("@ u", "transparency", spawn "xcompmgr") -- =<< asks (terminal . XMonad.config))
@@ -401,3 +401,9 @@ pangoSanitize = foldr sanitize ""
     sanitize '\"' xs = "&quot;" ++ xs
     sanitize '&'  xs = "&amp;" ++ xs
     sanitize x    xs = x:xs
+
+
+-- Like W.swapMaster but swap with next if master as focus
+swapMasterOrShift s = case W.stack $ W.workspace $ W.current s of
+  Just (W.Stack _ [] _) -> W.swapMaster . W.focusDown  $ s
+  _ -> W.swapMaster s
