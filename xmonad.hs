@@ -2,6 +2,7 @@
 import XMonad hiding((|||))
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
+import Data.Foldable(asum)
 import System.Exit
 import XMonad.Prompt
 import XMonad.Prompt.Shell
@@ -141,32 +142,32 @@ main = do
         -- @ will be replace by the "leader"
         commands = [
                    -- layout
-                     ("@f", "Full" , (sendMessage $ ToggleLayout)) -- >> sendMessage ToggleStruts)
-                   , ("@S-f", "Grid" , sendMessage $ JumpToLayout "Grid")
-                   , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
-                   , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
-                   , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
-                   , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
-                   , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
-		   -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
-		   , ("@1", "Full Screen", setLimit 1)
-		   , ("@2", "Two Panes Limit", setLimit 2)
-		   , ("@3", "Three Panes Layout", setLimit 3)
-		   , ("@4", "Four Panes Layout", setLimit 4)
-		   , ("@5", "Decrease limit", decreaseLimit)
-		   , ("@6", "Two Pane Layout", setLimit 6)
-		   , ("@7", "Increase limit", increaseLimit)
-		   -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
+                       ("@f", "Full" , (sendMessage $ ToggleLayout)) -- >> sendMessage ToggleStruts)
+                     , ("@S-f", "Grid" , sendMessage $ JumpToLayout "Grid")
+                     , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
+                     , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
+                     , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
+                     , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
+                     , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
+                   -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
+                     , ("@1", "Full Screen", setLimit 1)
+                     , ("@2", "Two Panes Limit", setLimit 2)
+                     , ("@3", "Three Panes Layout", setLimit 3)
+                     , ("@4", "Four Panes Layout", setLimit 4)
+                     , ("@5", "Decrease limit", decreaseLimit)
+                     , ("@6", "Two Pane Layout", setLimit 6)
+                     , ("@7", "Increase limit", increaseLimit)
+                   -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
-                   , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
-                   , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
-                   , ("@q t", "Toggle Struts", sendMessage ToggleStruts ) -- workaround xmobar not showing on screen1
-                   , ("@l r", "Reset layouts", setLayout =<< asks (XMonad.layoutHook  . XMonad.config ))
-                   , ("@ <Space>", "Prompt", runCommand commands')
-                   , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
-                   , ("@S-r", "Refresh", refresh)
-                   , ("M1-;", "run or raise", runOrRaisePrompt xpConfig)
-                   , ("@ a a", "run or raise", runOrRaisePrompt xpConfig)
+                     , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
+                     , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+                     , ("@q t", "Toggle Struts", sendMessage ToggleStruts ) -- workaround xmobar not showing on screen1
+                     , ("@l r", "Reset layouts", setLayout =<< asks (XMonad.layoutHook  . XMonad.config ))
+                     , ("@ <Space>", "Prompt", runCommand commands')
+                     , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
+                     , ("@S-r", "Refresh", refresh)
+                     , ("M1-;", "run or raise", runOrRaisePrompt xpConfig)
+                     , ("@ a a", "run or raise", runOrRaisePrompt xpConfig)
                    -- windows
                      , ("@S-,", "Shrink", sendMessage Shrink)
                      , ("@S-.", "Expand", sendMessage Expand)
@@ -220,16 +221,19 @@ main = do
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
-		   ++ -- Workspaces operations
+           ++ [ ("@ S-d " ++ c, "Kill from workspace", killForeigns c)
+              | c <- map show [1..9] -- ++ map (:[]) extraWs
+              ]
+           ++ -- Workspaces operations
                    [ (key ++ show i, description ++ show i, sequence_ $ map windows (map ($show i) command))
                    | i <- [1..9] :: [Int]
-		   , (key, description, command) <- [ ("M1-",  "Switch to ", [W.greedyView])
-					            , ("@ l ", "Layer ", [W.greedyView])
-					            , ("M1-S-", "Shift (push) ", [W.shift])
-					            , ("@ S-p ", "Push ", [W.shift])
-			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
-			 	                    , ("@ S-t ", "Put ", [copy])
-			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
+           , (key, description, command) <- [ ("M1-",  "Switch to ", [W.greedyView])
+                                , ("@ l ", "Layer ", [W.greedyView])
+                                , ("M1-S-", "Shift (push) ", [W.shift])
+                                , ("@ S-p ", "Push ", [W.shift])
+                                 , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
+                                     , ("@ S-t ", "Put ", [copy])
+                                 , ("@ t ", "Put and go ", [copy, W.greedyView])
                                                     , ("@ t S-", "Put all and go", [copyAll, W.greedyView])
                                                     , ("@ S-t S-", "Put all", [copyAll])
                                                     , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
@@ -240,18 +244,18 @@ main = do
                                                     , ("@ S-i ", "Swap all and go, local", [swapAll' , W.greedyView])
 -- d delete
 -- D delete all others
-			 		           ]
-	           ]
-		   ++ -- Workspaces operations
+                                ]
+               ]
+           ++ -- Workspaces operations
                    [ (key ++ [c], description ++ [c], sequence_ $ map windows (map ($ [c]) command))
                    | c <- extraWs :: [Char]
-		   , (key, description, command) <- [ -- ("M1-",  "Switch to ", [W.greedyView])
-					             ("@ l ", "Layer ", [W.greedyView])
-					            -- , ("M1-S-", "Shift (push) ", [W.shift])
-					            , ("@ S-p ", "Push ", [W.shift])
-			 		            , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
-			 	                    , ("@ S-t ", "Put ", [copy])
-			 		            , ("@ t ", "Put and go ", [copy, W.greedyView])
+           , (key, description, command) <- [ -- ("M1-",  "Switch to ", [W.greedyView])
+                                 ("@ l ", "Layer ", [W.greedyView])
+                                -- , ("M1-S-", "Shift (push) ", [W.shift])
+                                , ("@ S-p ", "Push ", [W.shift])
+                                 , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
+                                     , ("@ S-t ", "Put ", [copy])
+                                 , ("@ t ", "Put and go ", [copy, W.greedyView])
                                                     , ("@ t S-", "Put all and go", [copyAll, W.greedyView])
                                                     , ("@ S-t S-", "Put all", [copyAll])
                                                     , ("@ p S-", "Push all and go", [shiftAll, W.greedyView])
@@ -262,8 +266,8 @@ main = do
                                                     , ("@ S-i ", "Swap all and go, local", [swapAll' , W.greedyView])
 -- d delete
 -- D delete all others
-			 		           ]
-	           ]
+                                ]
+               ]
                   ++ -- windows operations
                   [ ("@ w " ++ show i, "Focus to " ++ show i, focusNth (i-1) )
                     | i <- [1..9]
@@ -286,7 +290,7 @@ main = do
                     )
                   ]
         commands' = [(s ++ " [" ++ k++ "] " , c) | (k,s,c) <- commands, s /= ""]
-	-- commands' = [("dummy", return ())]
+    -- commands' = [("dummy", return ())]
         myKeysWithName c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
         myKeys c = mkKeymap c [(processKey key, command) | (key, name, command) <- commands, key /= ""]
         -- (subtitle "Custom Keys":) $ mkNamedKeymap c $
@@ -354,6 +358,28 @@ swapAll' i0 stackset = let
   -- in swapAll i0 stackset
 killAll = withAll (\w -> do (focus w) >> kill1)
 
+-- | Kill all windows of the current
+-- workspace belonging also to the given one
+killForeigns tagToKill = do
+  stackset <- gets windowset
+  let currentTag = W.currentTag stackset
+      focusM = W.peek stackset
+      currentWindows = W.current stackset
+      foreignStackm = asum
+                      $ map
+                      ( \w -> if W.tag w == tagToKill
+                              then W.stack w
+                              else Nothing
+                      )
+                      (map W.workspace (W.visible stackset ) ++ W.hidden stackset)
+      foreignWindows = W.integrate'  $ foreignStackm
+  -- we just need to remove all window in the current workspace
+  -- not belonging to foreignWindows. We don't need to kill them
+  -- as we are sure there is still a copy available in the foreign WS.
+  windows (W.modify Nothing $ W.filter (`notElem` foreignWindows))
+
+      
+  
 centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
 bigCenterR = W.RationalRect (1/8) (1/8) (3/4) (3/4)
 leftR = W.RationalRect (0) (1/8) (1/2) (3/4)
