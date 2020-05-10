@@ -186,6 +186,7 @@ main = do
                      , ("@S-d", "Delete all copy window", killAllOtherCopies )
                      , ("@d w", "Delete all workspace windows", killAll)
                      , ("@d S-w", "Delete all workspace windows", killAll >> moveTo Prev NonEmptyWS)
+                     , ("@d 0", "Kill all foreign windows", killForeigns Nothing)
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
@@ -221,7 +222,7 @@ main = do
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
-           ++ [ ("@ d " ++ c, "Kill from workspace", killForeigns c)
+           ++ [ ("@ d " ++ c, "Kill from workspace", killForeigns (Just c))
               | c <- map show [1..9] ++ map (:[]) extraWs
               ]
            ++ -- Workspaces operations
@@ -360,14 +361,18 @@ killAll = withAll (\w -> do (focus w) >> kill1)
 
 -- | Kill all windows of the current
 -- workspace belonging also to the given one
-killForeigns tagToKill = do
+-- If no workspace is provided , kill all foreigns
+killForeigns tagToKillm = do
   stackset <- gets windowset
   let currentTag = W.currentTag stackset
       focusM = W.peek stackset
       currentWindows = W.current stackset
+      wsToKeep w = case tagToKillm of
+                     Just tag -> W.tag w == tag
+                     Nothing -> W.tag w /= currentTag
       foreignStackm = asum
                       $ map
-                      ( \w -> if W.tag w == tagToKill
+                      ( \w -> if wsToKeep w
                               then W.stack w
                               else Nothing
                       )
