@@ -58,7 +58,7 @@ import qualified Codec.Binary.UTF8.String as UTF8
 --                                       , inactiveTextColor   = "#ffcc33"
 --                                       , fontName = ""
 --                                       }
-layout = toggleLayouts (noBorders Full) $ limitSlice 6 layout'
+layout = toggleLayouts (noBorders Full) $ limitWindows 6 layout'
 layout' = name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
