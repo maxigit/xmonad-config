@@ -222,7 +222,7 @@ main = do
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
            ++ [ ("@ d " ++ c, "Kill from workspace", killForeigns c)
-              | c <- map show [1..9] -- ++ map (:[]) extraWs
+              | c <- map show [1..9] ++ map (:[]) extraWs
               ]
            ++ -- Workspaces operations
                    [ (key ++ show i, description ++ show i, sequence_ $ map windows (map ($show i) command))
