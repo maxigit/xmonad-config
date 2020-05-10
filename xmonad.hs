@@ -207,11 +207,15 @@ main = do
                        , ("@ a E", "Emacs -nw", spawn "emacs")
                        , ("@ a n", "nautilus", spawn "nautilus")
                    -- Search
+                       , ("@ s d", "Search in Dictionary", promptSearch' xpConfig duckduckgo)
                        , ("@ s g", "Search in Dictionary", promptSearch' xpConfig google)
                        , ("@ s h", "Search in Dictionary", promptSearch' xpConfig hoogle)
                        , ("@ s k", "Search in Dictionary", promptSearch' xpConfig hackage)
                        , ("@ s w", "Search in Dictionary", promptSearch' xpConfig wikipedia)
                        , ("@ s s", "Search in Dictionary", promptSearch' xpConfig multi)
+                       , ("@ s t", "Search in Dictionary", promptSearch' xpConfig stackage)
+                       , ("@ s f", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-12.26" "http://stackage.org/lts-12.26/hoogle?q=")
+                       , ("@ s m", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-10.9" "http://stackage.org/lts-10.9/hoogle?q=")
                    -- workspaces
                        , ("@ l l", "Toggle to previous Workspace ", toggleWS)
                        , ("@ l n", "Switch to next (non-empty) workspace ", moveTo Next NonEmptyWS  )
