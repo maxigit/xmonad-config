@@ -182,11 +182,11 @@ main = do
                      , ("@ S-b", "Bring window", bringMenu )
                      , ("@ b", "Bring window next", actionMenu def (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
                      , ("@ g", "Master window", actionMenu def (\w s -> W.shiftMaster $ W.focusWindow w s))
-                     , ("@ d d", "Delete window", kill1 )
+                     , ("@ d", "Delete window", kill1 )
                      , ("@S-d", "Delete all copy window", killAllOtherCopies )
-                     , ("@d w", "Delete all workspace windows", killAll)
-                     , ("@d S-w", "Delete all workspace windows", killAll >> moveTo Prev NonEmptyWS)
-                     , ("@d 0", "Kill all foreign windows", killForeigns Nothing)
+                     , ("@S-d w", "Delete all workspace windows", killAll)
+                     , ("@S-d S-w", "Delete all workspace windows", killAll >> moveTo Prev NonEmptyWS)
+                     , ("@S-d 0", "Kill all foreign windows", killForeigns Nothing)
                    --   focus
                      , ("@m", "Focus Master", windows W.focusMaster)
                      , ("@n", "Focus Next", windows W.focusDown)
@@ -222,7 +222,7 @@ main = do
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
-           ++ [ ("@ d " ++ c, "Kill from workspace", killForeigns (Just c))
+           ++ [ ("@ S-d " ++ c, "Kill from workspace", killForeigns (Just c))
               | c <- map show [1..9] ++ map (:[]) extraWs
               ]
            ++ -- Workspaces operations
