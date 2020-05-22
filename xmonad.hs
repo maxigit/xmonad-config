@@ -195,6 +195,8 @@ main = do
                      , ("@S-s S-c", "Float window center", withFocused $ windows . flip W.float bigCenterR )
                      , ("@S-s h", "Float window center", withFocused $ windows . flip W.float leftR )
                      , ("@S-s i", "Float window center", withFocused $ windows . flip W.float rightR )
+                     , ("@S-s b", "Float window center", withFocused $ windows . flip W.float smallRightR )
+                     , ("@S-s t", "Float window center", withFocused $ windows . flip W.float smallTopR )
                      , ("@ S-g", "Goto window", gotoMenu )
                      , ("@ S-b", "Bring window", bringMenu )
                      , ("@ b", "Bring window next", actionMenu def (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
@@ -410,6 +412,8 @@ centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
 bigCenterR = W.RationalRect (1/8) (1/8) (3/4) (3/4)
 leftR = W.RationalRect (0) (1/8) (1/2) (3/4)
 rightR = W.RationalRect (4/8) (1/8) (1/2) (3/4)
+smallRightR = W.RationalRect (3/4) (7/8) (1/4) (1/8)
+smallTopR = W.RationalRect (3/4) (2/8) (1/4) (1/8)
 
 
 
