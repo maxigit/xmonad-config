@@ -38,6 +38,7 @@ import XMonad.Layout.ThreeColumns
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.FadeInactive
+import XMonad.Hooks.FadeWindows(isFloating)
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap, mkKeymap)
 import XMonad.Util.NamedActions
@@ -118,7 +119,18 @@ main = do
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
-                       , logHook = myDBusHook dbus <+> fadeInactiveLogHook 0.85
+                       , logHook = myDBusHook dbus <+> fadeOutLogHook (
+                          do
+                            unfocused <- isUnfocused
+                            if unfocused
+                            then do
+                              floating <- isFloating
+                              if floating
+                              then return 0.6
+                              else return 0.85
+                            else return 1
+                                                                      )
+
                        , modMask = modm     -- Rebind Mod to the Windows key
                        , borderWidth = 2
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
