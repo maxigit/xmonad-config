@@ -176,8 +176,8 @@ main = do
                    -- windows
                      , ("@S-,", "Shrink", sendMessage Shrink)
                      , ("@S-.", "Expand", sendMessage Expand)
-                     , ("@,", "Decrement master", sendMessage $ IncMasterN (-1) ) -- 
-                     , ("@.", "Increment master", sendMessage $ IncMasterN 1)
+                     , ("@,", "Decrement master", sendMessage (IncMasterN (-1)) >> sendMessage (GV.IncMasterCols (-1))) -- 
+                     , ("@.", "Increment master", sendMessage (IncMasterN 1) >> sendMessage (GV.IncMasterCols 1))
                      , ("@S-s s", "Sink window", withFocused $ windows . W.sink)
                      , ("@S-s c", "Float window center", withFocused $ windows . flip W.float centerR )
                      , ("@S-s S-c", "Float window center", withFocused $ windows . flip W.float bigCenterR )
