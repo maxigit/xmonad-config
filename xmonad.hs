@@ -28,6 +28,7 @@ import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid
+import qualified XMonad.Layout.GridVariants as GV
 import XMonad.Layout.Tabbed
 -- import XMonad.Layout.Dishes
 import XMonad.Layout.Dwindle
@@ -71,9 +72,11 @@ layout' = name "Dwindle" (Dwindle R CW 1.5 1.1)
      -- ||| name "Ver2" (Mirror twoP)
   where
     name n = renamed [Replace n] . smartBorders
-    tiled = Tall 2 (10/100) (1/2)
+    -- tiled = Tall 2 (10/100) (1/2)
     -- tiled = Dishes 2 (10/100)
-    tiledG = Tall 1 (5/100) (9/10) -- (g/(1+g))
+    tiled = GV.SplitGrid GV.L 1 2 (2/3) (10/10) (5/100)
+    -- tiledG = Tall 1 (5/100) (9/10) -- (g/(1+g))
+    tiledG = GV.SplitGrid GV.L 1 2 (9/10) (10/10) (5/100)
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
        
