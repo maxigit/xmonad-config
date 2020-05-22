@@ -33,7 +33,7 @@ import XMonad.Layout.Tabbed
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
- 
+import XMonad.Layout.ThreeColumns
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.FadeInactive
@@ -59,13 +59,14 @@ import qualified Codec.Binary.UTF8.String as UTF8
 --                                       , fontName = ""
 --                                       }
 layout = toggleLayouts (noBorders Full) $ limitWindows 6 layout'
-layout' = name "Hor" tiled
+layout' = name "Dwindle" (Dwindle R CW 1.5 1.1)
+     ||| name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
      ||| name "Grid"  Grid
-     ||| name "Dwindle" (Dwindle R CW 1.5 1.1)
+     ||| name "ThreeMid" (ThreeColMid 1 (3/100) (1/2))
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
@@ -149,6 +150,7 @@ main = do
                      , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
                      , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
                      , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
+                     , ("@S-c", "Three", sendMessage $ JumpToLayout "ThreeMid")
                    -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
                      , ("@1", "Full Screen", setLimit 1)
                      , ("@2", "Two Panes Limit", setLimit 2)
