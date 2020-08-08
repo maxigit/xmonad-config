@@ -221,7 +221,7 @@ main = do
                    -- applications
                        , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
-                       , ("@ a f", "Firefox", spawn "firefox")
+                       , ("@ a f", "Firefox", spawn "qutebrowser")
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
                        , ("@ a n", "nautilus", spawn "nautilus")
@@ -231,7 +231,7 @@ main = do
                        , ("@ s h", "Search in Dictionary", promptSearch' xpConfig hoogle)
                        , ("@ s k", "Search in Dictionary", promptSearch' xpConfig hackage)
                        , ("@ s w", "Search in Dictionary", promptSearch' xpConfig wikipedia)
-                       , ("@ s s", "Search in Dictionary", promptSearch' xpConfig multi)
+                       , ("@ s s", "Search in Dictionary", promptSearch' xpConfig duckduckgo) -- multi)
                        , ("@ s t", "Search in Dictionary", promptSearch' xpConfig stackage)
                        , ("@ s f", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-12.26" "http://stackage.org/lts-12.26/hoogle?q=")
                        , ("@ s m", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-10.9" "http://stackage.org/lts-10.9/hoogle?q=")
