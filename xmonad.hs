@@ -127,14 +127,14 @@ main = do
                               floating <- isFloating
                               if floating
                               then return 0.6
-                              else return 0.85
+                              else return 0.95 -- 0.85
                             else return 1
                                                                       )
 
                        , modMask = modm     -- Rebind Mod to the Windows key
                        , borderWidth = 2
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
-                       , normalBorderColor = "#0000"
+                       , normalBorderColor = "#000000"
                        , workspaces = [ p <> ws
                                       | ws <- map show [1..9] ++ map return extraWs
                                       , p <- "" : map show [1..9]
