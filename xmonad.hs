@@ -34,6 +34,7 @@ import XMonad.Layout.Tabbed
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
+import XMonad.Layout.AvoidFloats
 import XMonad.Layout.ThreeColumns
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -119,7 +120,7 @@ main = do
                        { manageHook = myManageHook <+> manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
-                       , layoutHook = avoidStruts layout
+                       , layoutHook = avoidFloats $ avoidStruts layout
                        , logHook = myDBusHook dbus <+> fadeOutLogHook (
                           do
                             unfocused <- isUnfocused
@@ -191,6 +192,7 @@ main = do
                      , ("@S-.", "Expand", sendMessage Expand)
                      , ("@,", "Decrement master", sendMessage (IncMasterN (-1)) >> sendMessage (GV.IncMasterCols (-1))) -- 
                      , ("@.", "Increment master", sendMessage (IncMasterN 1) >> sendMessage (GV.IncMasterCols 1))
+                     , ("@S-s a", "Avoid float toggle", withFocused $ sendMessage . AvoidFloatToggleItem )
                      , ("@S-s s", "Sink window", withFocused $ windows . W.sink)
                      , ("@S-s c", "Float window big center", withFocused $ windows . flip W.float centerR )
                      , ("@S-s S-s", "Float window center", withFocused $ windows . flip W.float bigCenterR )
