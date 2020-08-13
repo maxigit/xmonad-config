@@ -37,6 +37,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.ThreeColumns
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers hiding(CW)
 import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.FadeWindows(isFloating)
 import XMonad.Util.Run(spawnPipe)
@@ -115,7 +116,7 @@ main = do
     getWellKnownName dbus
 
     let config =  docks $ defaultConfig
-                       { manageHook = manageHook defaultConfig
+                       { manageHook = myManageHook <+> manageHook defaultConfig
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidStruts layout
@@ -191,12 +192,12 @@ main = do
                      , ("@,", "Decrement master", sendMessage (IncMasterN (-1)) >> sendMessage (GV.IncMasterCols (-1))) -- 
                      , ("@.", "Increment master", sendMessage (IncMasterN 1) >> sendMessage (GV.IncMasterCols 1))
                      , ("@S-s s", "Sink window", withFocused $ windows . W.sink)
-                     , ("@S-s c", "Float window center", withFocused $ windows . flip W.float centerR )
-                     , ("@S-s S-c", "Float window center", withFocused $ windows . flip W.float bigCenterR )
-                     , ("@S-s h", "Float window center", withFocused $ windows . flip W.float leftR )
-                     , ("@S-s i", "Float window center", withFocused $ windows . flip W.float rightR )
-                     , ("@S-s b", "Float window center", withFocused $ windows . flip W.float smallRightR )
-                     , ("@S-s t", "Float window center", withFocused $ windows . flip W.float smallTopR )
+                     , ("@S-s c", "Float window big center", withFocused $ windows . flip W.float centerR )
+                     , ("@S-s S-s", "Float window center", withFocused $ windows . flip W.float bigCenterR )
+                     , ("@S-s h", "Float window left", withFocused $ windows . flip W.float leftR )
+                     , ("@S-s l", "Float window right", withFocused $ windows . flip W.float rightR )
+                     , ("@S-s b", "Float window bottom", withFocused $ windows . flip W.float smallRightR )
+                     , ("@S-s t", "Float window top", withFocused $ windows . flip W.float smallTopR )
                      , ("@ S-g", "Goto window", gotoMenu )
                      , ("@ S-b", "Bring window", bringMenu )
                      , ("@ b", "Bring window next", actionMenu def (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
@@ -415,6 +416,8 @@ rightR = W.RationalRect (4/8) (1/8) (1/2) (3/4)
 smallRightR = W.RationalRect (3/4) (7/8) (1/4) (1/8)
 smallTopR = W.RationalRect (3/4) (2/8) (1/4) (1/8)
 
+myManageHook = composeAll
+  [ appName =? "gvim" --> doRectFloat centerR ]
 
 
 -- from xmonad-log-applet
