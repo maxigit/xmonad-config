@@ -225,6 +225,8 @@ main = do
                        , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "qutebrowser")
+                       , ("@ '", "Qutebrowser open", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :open")
+                       , ("@ a o", "Qutebrower quickmark", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :quickmark-load")
                        , ("@ a s", "Spotify", spawn "spotify")
                        , ("@ a S-p", "Passmenu", spawn "passmenu")
                        , ("@ a p", "Passmenu", spawn "passmenu --type")
