@@ -206,6 +206,7 @@ main = do
                      , ("@ g", "Master window", actionMenu def (\w s -> W.shiftMaster $ W.focusWindow w s))
                      , ("@ d", "Delete window", kill1 )
                      , ("@S-d d", "Delete all copy window", killAllOtherCopies )
+                     , ("@S-d S-d", "Delete non focused window", killOthers )
                      , ("@S-d w", "Delete all workspace windows", killAll)
                      , ("@S-d S-w", "Delete all workspace windows", killAll >> moveTo Prev NonEmptyWS)
                      , ("@C-k", "Kill all foreign windows", killForeigns Nothing)
@@ -389,6 +390,16 @@ swapAll' i0 stackset = let
   in swapAll i stackset
   -- in swapAll i0 stackset
 killAll = withAll (\w -> do (focus w) >> kill1)
+
+-- | Kill all non focus window  on the current workspace
+killOthers = do
+  stackset <- gets windowset
+  let focusM = W.peek stackset
+  withAll (\w -> if (Just w == focusM)
+                 then return ()
+                 else focus w >> kill1 
+          )
+  
 
 -- | Kill all windows of the current
 -- workspace belonging also to the given one
