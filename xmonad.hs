@@ -3,6 +3,7 @@ import XMonad hiding((|||))
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
 import Data.Foldable(asum)
+import Data.Maybe(isJust)
 import System.Exit
 import XMonad.Prompt
 import XMonad.Prompt.Shell
@@ -27,7 +28,7 @@ import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
-import XMonad.Layout.Grid
+import XMonad.Layout.Grid as Grid
 import qualified XMonad.Layout.GridVariants as GV
 import XMonad.Layout.Tabbed
 -- import XMonad.Layout.Dishes
@@ -221,7 +222,6 @@ main = do
                    -- toggle transparency
                        , ("@ u", "transparency", spawn "xcompmgr") -- =<< asks (terminal . XMonad.config))
                        , ("@ S-u", "no transparency", spawn "killall xcompmgr") -- =<< asks (terminal . XMonad.config))
-                    
                    -- applications
                        , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
@@ -244,6 +244,13 @@ main = do
                        , ("@ s t", "Search in Dictionary", promptSearch' xpConfig stackage)
                        , ("@ s f", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-12.26" "http://stackage.org/lts-12.26/hoogle?q=")
                        , ("@ s m", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-10.9" "http://stackage.org/lts-10.9/hoogle?q=")
+                   -- virtual moitnor
+                       , ("@ z v", "Split virtual monitor", myRescreen (makeVirtual 50))
+                       , ("@ z S-v", "Split virtual monitor", myRescreen (makeVirtual 66))
+                       , ("@ z S-z", "Split virtual monitor", myRescreen (makeVirtual 75))
+                       , ("@ z z", "Split virtual monitor", myRescreen (const id))
+                       , ("@ z g", "Split virtual monitor", myRescreen makeVirtualGrid)
+                       , ("@ z c", "Split virtual monitor", myRescreen makeVirtualCenter)
                    -- workspaces
                        , ("@ l l", "Toggle to previous Workspace ", toggleWS)
                        , ("@ l n", "Switch to next (non-empty) workspace ", moveTo Next NonEmptyWS  )
@@ -484,3 +491,50 @@ pangoSanitize = foldr sanitize ""
 swapMasterOrShift s = case W.stack $ W.workspace $ W.current s of
   Just (W.Stack _ [] _) -> W.swapMaster . W.focusDown  $ s
   _ -> W.swapMaster s
+
+
+
+
+-- | copied From Xmonad.rescreen
+myRescreen :: ([String] -> [Rectangle] -> [Rectangle]) -> X ()
+myRescreen  f = do                         
+    xinesc' <- withDisplay getCleanedScreenInfo
+
+    windows $ \ws@(W.StackSet { W.current = v, W.visible = vs, W.hidden = hs }) ->
+        let (xs, ys) = splitAt (length xinesc) $ map W.workspace (v:vs) ++ hs
+            (a:as)   = zipWith3 W.Screen xs [0..] $ map SD xinesc
+            wsnames = map W.tag $ map W.workspace (v:vs) ++ (filter (isJust . W.stack ) hs)
+            xinesc = f wsnames xinesc'
+        in  ws { W.current = a
+               , W.visible = as
+               , W.hidden  = ys }
+
+-- makeVirtual :: Word32 -> [Rectangle] -> [Rectangle]
+makeVirtual ratio _ (Rectangle x0 y0 w0 h0:recs) = let
+  w1 = w0 * ratio `div` 100
+  b = 10
+  x2 = x0+fromIntegral w1+b
+  in [Rectangle x0 y0 w1 h0, Rectangle x2 y0 (w0-w1-fromIntegral b) h0] ++ recs
+
+makeVirtualGrid :: [String] -> [Rectangle] -> [Rectangle]
+makeVirtualGrid ws (r:recs) =  let
+  -- use a Grid layout to do the work for us
+  grids = Grid.arrange Grid.defaultRatio r [1..length ws - length recs]
+  in  map snd grids ++ recs
+
+makeVirtualCenter :: [String] -> [Rectangle]  -> [Rectangle]
+makeVirtualCenter ws recs = 
+  let l = Rectangle 0 0 320 1080
+      m = Rectangle 320 0 1920  1080
+      r = Rectangle (1920+320) 0 320 1080
+  in case length $ filter (`elem` map show [1..9]) ws  of
+    1 -> [m]
+    2 -> [m,r]
+    _ -> [m,r,l]
+
+
+
+
+  
+  
+  
