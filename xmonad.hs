@@ -116,6 +116,7 @@ main = do
   -- xmproc <- spawnPipe "xmobar"
     dbus <- D.connectSession
     getWellKnownName dbus
+    _ <- spawn "xvisbell"
 
     let config =  docks $ defaultConfig
                        { manageHook = myManageHook <+> manageHook defaultConfig
@@ -442,7 +443,8 @@ smallRightR = W.RationalRect (3/4) (7/8) (1/4) (1/8)
 smallTopR = W.RationalRect (3/4) (2/8) (1/4) (1/8)
 
 myManageHook = composeAll
-  [ appName =? "gvim" --> doRectFloat centerR ]
+  [ appName =? "gvim" --> doRectFloat centerR 
+  , appName =? "xvisbell" --> doRectFloat centerR ]
 
 
 -- from xmonad-log-applet
