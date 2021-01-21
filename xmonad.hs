@@ -31,6 +31,7 @@ import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid as Grid
 import qualified XMonad.Layout.GridVariants as GV
 import XMonad.Layout.Tabbed
+import XMonad.Layout.PerScreen(ifWider)
 -- import XMonad.Layout.Dishes
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
@@ -64,7 +65,7 @@ import qualified Codec.Binary.UTF8.String as UTF8
 --                                       , fontName = ""
 --                                       }
 layout = toggleLayouts (noBorders Full) $ limitWindows 6 layout'
-layout' = name "Dwindle" (Dwindle R CW 1.5 1.1)
+layout' = name "Dwindle" (ifWider 1000 (Dwindle R CW 1.5 1.1) (Squeeze D 2.5 1.1))
      ||| name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
