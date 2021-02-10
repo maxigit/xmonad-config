@@ -106,13 +106,31 @@ myDBusHook dbus =  do
   -- print in red workspace containing a copy of the focuse window
   let checkTag ws | ws `elem` copies = pangoColor "orange" $ pad ws
                   | otherwise = pad ws
+  -- find how many windows on the current workspace
+  wset <- gets windowset
+  let windowNumber = 
+        case W.stack $ W.workspace (W.current wset) of
+            Nothing -> ""
+            Just (W.Stack _ u d) ->
+                case (length u, length d) of
+                  (0,0) -> "" -- 1
+                  (0,1) -> pangoColor "darkred" " ½"
+                  (1,0) -> pangoColor "darkred" " 2"
+                  (0,2) -> pangoColor "red" " ⅓"
+                  (1,1) -> pangoColor "red" " ⅔"
+                  (2,0) -> pangoColor "red" " 3"
+                  (0,3) -> pangoColor "orange" " ¼"
+                  (1,2) -> pangoColor "orange" " ²"
+                  (2,1) -> pangoColor "orange" " ¾"
+                  (3,0) -> pangoColor "orange" " 4"
+                  (a,b) -> pangoColor "yellow" (show (a+1)) ++ pangoColor "darkred"  "/" ++ pangoColor "orange" ( show (a+b+1))
   dynamicLogWithPP $ (defaultPP)
     { ppOutput   = dbusOutput dbus
     , ppTitle    = pangoSanitize
     , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
     , ppVisible  = pangoColor "green" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
-   , ppLayout = pangoColor "darkred"
+   , ppLayout = \name -> pangoColor "darkred" name ++ windowNumber
   }
 main = do
   -- xmproc <- spawnPipe "xmobar"
