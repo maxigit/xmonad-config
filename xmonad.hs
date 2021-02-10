@@ -49,6 +49,7 @@ import XMonad.Util.NamedActions
 import System.IO
 import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
+import Data.List(isSuffixOf)
 
 import XMonad.Util.Themes
 import XMonad.Util.Themes
@@ -446,6 +447,7 @@ smallTopR = W.RationalRect (3/4) (2/8) (1/4) (1/8)
 
 myManageHook = composeAll
   [ appName =? "gvim" --> doRectFloat centerR 
+  , fmap (isSuffixOf "mium") appName --> doRectFloat centerR 
   , appName =? "xvisbell" --> doRectFloat centerR ]
 
 
