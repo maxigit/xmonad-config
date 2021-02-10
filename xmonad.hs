@@ -237,6 +237,7 @@ main = do
                        , ("@ a e", "Emacs", spawn "emacs")
                        , ("@ a E", "Emacs -nw", spawn "emacs")
                        , ("@ a n", "nautilus", spawn "nautilus")
+                       , ("@ a x", "tmux", spawn "gnome-terminal -- tmux")
                    -- Search
                        , ("@ s d", "Search in Dictionary", promptSearch' xpConfig duckduckgo)
                        , ("@ s g", "Search in Dictionary", promptSearch' xpConfig google)
@@ -265,6 +266,13 @@ main = do
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
+           ++ -- Tmux session
+              [ ("@a " ++ c, "Attach tmux session", spawn $ "gnome-terminal -- tmux attach-session -t" ++ c)
+              | c <- map show [0..9]
+              ]
+           ++ [ ("@a S-" ++ c, "Attach tmux session (Read only)", spawn $ "gnome-terminal --profile=dark -- tmux attach-session -r -t" ++ c)
+              | c <- map show [0..9]
+              ]
            ++ [ ("@ k " ++ c, "Kill from workspace", killForeigns (Just c))
               | c <- map show [1..9] ++ map (:[]) extraWs
               ]
