@@ -286,17 +286,19 @@ main = do
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
            ++ -- tmux messages
-              [ ("@x "++n++m, "tmux send " ++ show msg ++ " -> " ++ target
+              [ ("@x "++m++" "++n, "tmux send " ++ show msg ++ " -> " ++ target
                 , spawn $ "tmux send-keys -t " ++ show target ++ " " ++ msg
                 )
-              | (target, n)  <- ("2-", "") : [ ("2-:dispatch="++c++"-", c) 
-                                             | c <- map show [0..9]
-                                             ]
-              , (m, msg) <- [("m", "main enter")
+              | (m, msg) <- [("m", "main enter")
                             ,("c", "C-c")
                             ,("a", "appMain enter")
-                            ,("u", "up enter")
+                            ,("", "up enter")
+                            ,("r", ":r enter")
+                            ,("S-r", "C-c :r enter")
                             ]
+              , (target, n)  <- ("2-", m ) : [ ("2-:dispatch="++c++"-", c) 
+                                             | c <- map show [0..9]
+                                             ]
               ]
            ++ -- Tmux session
               [ ("@a " ++ c, "Attach tmux session", spawn $ "gnome-terminal -- tmux attach-session -t" ++ c ++ "-")
@@ -354,6 +356,10 @@ main = do
                ]
                   ++ -- windows operations
                   [ ("@ w " ++ show i, "Focus to " ++ show i, focusNth (i-1) )
+                    | i <- [1..9]
+                  ]
+                  ++
+                  [ ("@ S-d " ++ show i, "Focus to " ++ show i, focusNth (i-1) >> kill1 >> windows W.focusMaster )
                     | i <- [1..9]
                   ]
                   ++
