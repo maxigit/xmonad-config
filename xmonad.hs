@@ -256,6 +256,7 @@ main = do
                        , ("@ a E", "Emacs -nw", spawn "emacs")
                        , ("@ a n", "nautilus", spawn "nautilus")
                        , ("@ a x", "tmux", spawn "gnome-terminal -- tmux")
+                       , ("@ a S-x", "tmux attach", spawn "gnome-terminal -- tmux attach-session")
                    -- Search
                        , ("@ s d", "Search in Dictionary", promptSearch' xpConfig duckduckgo)
                        , ("@ s g", "Search in Dictionary", promptSearch' xpConfig google)
@@ -284,11 +285,24 @@ main = do
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    ]
+           ++ -- tmux messages
+              [ ("@x "++n++m, "tmux send " ++ show msg ++ " -> " ++ target
+                , spawn $ "tmux send-keys -t " ++ show target ++ " " ++ msg
+                )
+              | (target, n)  <- ("2-", "") : [ ("2-:dispatch="++c++"-", c) 
+                                             | c <- map show [0..9]
+                                             ]
+              , (m, msg) <- [("m", "main enter")
+                            ,("c", "C-c")
+                            ,("a", "appMain enter")
+                            ,("u", "up enter")
+                            ]
+              ]
            ++ -- Tmux session
-              [ ("@a " ++ c, "Attach tmux session", spawn $ "gnome-terminal -- tmux attach-session -t" ++ c)
+              [ ("@a " ++ c, "Attach tmux session", spawn $ "gnome-terminal -- tmux attach-session -t" ++ c ++ "-")
               | c <- map show [0..9]
               ]
-           ++ [ ("@a S-" ++ c, "Attach tmux session (Read only)", spawn $ "gnome-terminal --profile=dark -- tmux attach-session -r -t" ++ c)
+           ++ [ ("@a S-" ++ c, "Attach tmux session (Read only)", spawn $ "gnome-terminal --profile=dark -- tmux attach-session -t" ++ c ++ "-")
               | c <- map show [0..9]
               ]
            ++ [ ("@ k " ++ c, "Kill from workspace", killForeigns (Just c))
