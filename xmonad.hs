@@ -114,8 +114,8 @@ myDBusHook dbus =  do
             Just (W.Stack _ u d) ->
                 case (length u, length d) of
                   (0,0) -> "" -- 1
-                  (0,1) -> pangoColor "darkred" " ½"
-                  (1,0) -> pangoColor "darkred" " 2"
+                  (0,1) -> pangoColor "blue" " ½"
+                  (1,0) -> pangoColor "blue" " 2"
                   (0,2) -> pangoColor "red" " ⅓"
                   (1,1) -> pangoColor "red" " ⅔"
                   (2,0) -> pangoColor "red" " 3"
@@ -130,7 +130,7 @@ myDBusHook dbus =  do
     , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
     , ppVisible  = pangoColor "green" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
-   , ppLayout = \name -> pangoColor "darkred" name ++ windowNumber
+   , ppLayout = \name -> pangoColor "blue" name ++ windowNumber
   }
 main = do
   -- xmproc <- spawnPipe "xmobar"
@@ -158,7 +158,7 @@ main = do
                        , modMask = modm     -- Rebind Mod to the Windows key
                        , borderWidth = 2
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
-                       , normalBorderColor = "#000000"
+                       , normalBorderColor = "darkblue"
                        , workspaces = [ p <> ws
                                       | ws <- map show [1..9] ++ map return extraWs
                                       , p <- "" : map show [1..9]
