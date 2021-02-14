@@ -147,12 +147,12 @@ main = do
                           do
                             unfocused <- isUnfocused
                             if unfocused
-                            then do
-                              floating <- isFloating
-                              if floating
-                              then return 0.6
-                              else return 0.95 -- 0.85
-                            else return 1
+                              then do
+                                floating <- isFloating
+                                if floating
+                                  then return 0.6
+                                  else return 0.95 -- 0.85
+                              else return 1
                                                                       )
 
                        , modMask = modm     -- Rebind Mod to the Windows key

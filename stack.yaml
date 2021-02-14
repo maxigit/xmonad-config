@@ -6,7 +6,7 @@ extra-deps:
   - X11-1.9.2
   - X11-xft-0.3.1
   #- containers-0.5.11.0
-  - dbus-1.2.1
+  - dbus-1.2.16
   - dbus-hslogger-0.1.0.1
   - gi-cairo-connector-0.0.1
   - gi-cairo-render-0.0.1
@@ -34,7 +34,6 @@ extra-deps:
   - xml-helpers-1.0.0
   - xmonad-0.15
   - xmonad-contrib-0.16
-  - network-2.8.0.1
 nix:
   enable: true
   packages:
