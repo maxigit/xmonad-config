@@ -1,0 +1,18 @@
+name:          xmonad-p70
+version: 1
+synopsis:      XMonad Confiu
+homepage:      http://xmonad.org
+license:       BSD2
+license-file:  LICENSE
+author:        Max
+maintainer:    Max
+build-type:    Simple
+cabal-version: >=1.2
+------------------------------------------------------------------------------
+executable xmonad
+  main-is: xmonad.hs
+  ghc-options: -Wall -Werror -fno-warn-missing-signatures
+  build-depends: base, xmonad, xmonad-contrib >= 0.16
+          , utf8-string
+          , containers
+          , dbus
