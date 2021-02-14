@@ -124,7 +124,7 @@ myDBusHook dbus =  do
                   (2,1) -> pangoColor "orange" " ¾"
                   (3,0) -> pangoColor "orange" " 4"
                   (a,b) -> pangoColor "yellow" (show (a+1)) ++ pangoColor "darkred"  "/" ++ pangoColor "orange" ( show (a+b+1))
-  dynamicLogWithPP $ (defaultPP)
+  dynamicLogWithPP $ (def)
     { ppOutput   = dbusOutput dbus
     , ppTitle    = pangoSanitize
     , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
@@ -138,8 +138,8 @@ main = do
     getWellKnownName dbus
     _ <- spawn "xvisbell"
 
-    let config =  docks $ defaultConfig
-                       { manageHook = myManageHook <+> manageHook defaultConfig
+    let config =  docks $ def
+                       { manageHook = myManageHook <+> manageHook def
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidFloats $ avoidStruts layout
@@ -403,11 +403,11 @@ remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
                  in M.fromList [(mod, submap $ keys' k)]
           
 
-xpConfig = defaultXPConfig { position = Top
+xpConfig = def { position = Top
                            , font =         "xft:Bitstream Vera Sans Mono:size=12:bold:antialias=true"
                            , searchPredicate = ignoreCase
                            }
-  where ignoreCase p s = searchPredicate defaultXPConfig (ic p) (ic s)
+  where ignoreCase p s = searchPredicate def (ic p) (ic s)
         ic = map toLower
 promptSearch' config engine = promptSearch config engine >> raise (className =? "Firefox" <||> className =? "Firefox-bin")
 
@@ -499,7 +499,7 @@ myManageHook = composeAll
 
 -- from xmonad-log-applet
 -- prettyPrinter :: D.Client -> PP
-prettyPrinter dbus = defaultPP
+prettyPrinter dbus = def
     { ppOutput   = dbusOutput dbus
     , ppTitle    = pangoSanitize
     , ppCurrent  = pangoColor "green" . wrap "[" "]" . pangoSanitize

@@ -33,7 +33,8 @@ extra-deps:
   - time-units-1.0.0
   - xml-helpers-1.0.0
   - xmonad-0.15
-  - xmonad-contrib-0.16
+  - /home/max/devel/xmonad-testing/xmonad-contrib
+#- xmonad-contrib-0.16 
 nix:
   enable: true
   packages:
