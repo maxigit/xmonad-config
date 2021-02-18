@@ -245,6 +245,7 @@ main = do
                        , ("@ S-u", "no transparency", spawn "killall xcompmgr") -- =<< asks (terminal . XMonad.config))
                    -- applications
                        , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
+                       , ("@ a S-t", "terminal", spawn "gnome-terminal --profile=Dwarffortress") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "qutebrowser")
                        , ("@ '", "Qutebrowser open", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :open")
