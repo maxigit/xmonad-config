@@ -50,12 +50,14 @@ import System.IO
 import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
 import Data.List(isSuffixOf)
+import XMonad.Util.NamedWindows (getName)
 
 import XMonad.Util.Themes
 import XMonad.Util.Themes
 import qualified DBus as D
 import qualified DBus.Client as D
 import qualified Codec.Binary.UTF8.String as UTF8
+
 -- layout = toggleLayouts Full layout'
 -- full = tabbedBottom shrinkText def { activeColor         = "#115422"
 --                                       , activeBorderColor   = "#1a8033"
@@ -65,7 +67,7 @@ import qualified Codec.Binary.UTF8.String as UTF8
 --                                       , inactiveTextColor   = "#ffcc33"
 --                                       , fontName = ""
 --                                       }
-layout = toggleLayouts (noBorders Full) $ limitWindows 6 layout'
+layout = toggleLayouts (noBorders simpleTabbedBottom) $ limitWindows 6 layout'
 layout' = name "Dwindle" (ifWider 1000 (Dwindle R CW 1.5 1.1) (Squeeze D 2.5 1.1))
      ||| name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
@@ -156,7 +158,7 @@ main = do
                                                                       )
 
                        , modMask = modm     -- Rebind Mod to the Windows key
-                       , borderWidth = 2
+                       , borderWidth = 1
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
                        , normalBorderColor = "darkblue"
                        , workspaces = [ p <> ws
@@ -222,10 +224,10 @@ main = do
                      , ("@S-s l", "Float window right", withFocused $ windows . flip W.float rightR )
                      , ("@S-s b", "Float window bottom", withFocused $ windows . flip W.float smallRightR )
                      , ("@S-s t", "Float window top", withFocused $ windows . flip W.float smallTopR )
-                     , ("@ S-g", "Goto window", gotoMenu )
-                     , ("@ S-b", "Bring window", bringMenu )
-                     , ("@ b", "Bring window next", actionMenu def (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
-                     , ("@ g", "Master window", actionMenu def (\w s -> W.shiftMaster $ W.focusWindow w s))
+                     , ("@ S-g", "Goto window", gotoMenuConfig def {windowTitler=myTitler} )
+                     , ("@ S-b", "Bring window", bringMenuConfig def {windowTitler=myTitler} )
+                     , ("@ b", "Bring window next", actionMenu def {windowTitler=myTitler} (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
+                     , ("@ g", "Master window", actionMenu def {windowTitler = myTitler} (\w s -> W.shiftMaster $ W.focusWindow w s))
                      , ("@ d", "Delete window", kill1 )
                      , ("@S-d d", "Delete all copy window", killAllOtherCopies )
                      , ("@S-d S-d", "Delete non focused window", killOthers )
@@ -602,4 +604,11 @@ makeVirtualCenter ws recs =
 
   
   
-  
+myTitler ws w = do
+  stackset <- gets windowset
+  let currentTag = W.currentTag stackset
+  name <- show `fmap` getName w
+  if W.tag ws == currentTag
+   then return $ "-]  " ++ name
+   else return $ W.tag ws ++ "] " ++ name
+
