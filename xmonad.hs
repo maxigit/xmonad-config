@@ -249,9 +249,10 @@ main = do
                      , ("@S-s b", "Float window bottom", withFocused $ windows . flip W.float smallRightR )
                      , ("@S-s t", "Float window top", withFocused $ windows . flip W.float smallTopR )
                      , ("@ S-g", "Goto window", gotoMenuConfig def {windowTitler=myTitler} )
-                     , ("@ S-b", "Bring window", bringMenuConfig def {windowTitler=myTitler} )
+                     , ("@ S-b", "Bring window as Master ", bringMenuConfig def {windowTitler=myTitler} )
                      , ("@ b", "Bring window next", actionMenu def {windowTitler=myTitler} (\w s -> W.swapMaster $ W.focusDown $ W.shiftMaster $ W.focusWindow w $ bringWindow w s))
                      , ("@ g", "Master window", actionMenu def {windowTitler = myTitler} (\w s -> W.shiftMaster $ W.focusWindow w s))
+                     , ("@ C-g", "Master window/Stay", onNextScreen $ actionMenu def {windowTitler = myTitler} (\w s -> W.shiftMaster $ W.focusWindow w s)) -- 
                      , ("@ d", "Delete window", kill1 )
                      , ("@S-d d", "Delete all copy window", killAllOtherCopies )
                      , ("@S-d S-d", "Delete non focused window", killOthers )
@@ -398,18 +399,18 @@ main = do
                                                    ]
                   ]
                   ++ -- switch screan
-                  [ ("@ S-w", "Next Screen", do
-                             wset <- gets windowset
-                             case W.visible wset of
-                                [] -> return ()
-                                (nextScreen:_) -> do
-                                   screenWorkspace (W.screen nextScreen) >>= flip whenJust (windows . W.view)
-                    )
+                  [ ("@ S-w", "Next Screen", nextScreen)
+                  , ("@ C-w", "Next Screen", prevScreen)
                   ]
         commands' = [(s ++ " [" ++ k++ "] " , c) | (k,s,c) <- commands, s /= ""]
     -- commands' = [("dummy", return ())]
         myKeysWithName c = (subtitle "Custom Keys": ) $ mkNamedKeymap c [(processKey key, addName name command) | (key, name, command) <- commands, key /= ""]
-        myKeys c = mkKeymap c [(processKey key, command) | (key, name, command) <- commands, key /= ""]
+        myKeys c = mkKeymap c $ 
+                    [(processKey key, command) | (key, name, command) <- commands, key /= ""]
+                    -- execute any action on next screen
+                    ++ [("C-<Space> " ++ processKey key, onNextScreen command) | (key, name, command) <- commands, key /= ""]
+                    -- execute any action on screen 3
+                    ++ [("C-<Space> C-<Space> " ++ processKey key, onNextScreen $ onNextScreen command) | (key, name, command) <- commands, key /= ""]
         -- (subtitle "Custom Keys":) $ mkNamedKeymap c $
         --                [ ("M1-S-;", addName "run command" $ runCommand commands') ]
     
@@ -643,3 +644,20 @@ myTitler ws w = do
    then return $ "'" ++ W.tag ws ++ ") " ++ name
    else return $ "," ++ W.tag ws ++ "] " ++ name
 
+
+-- Switch to the next screen. Execute the action
+-- and come back
+onNextScreen action = do
+  nextScreen
+  action
+  prevScreen
+
+lastScreen = do
+    wset <- gets windowset
+    case W.visible wset of
+       [] -> return ()
+       (nextScreen:_) -> do
+          screenWorkspace (W.screen nextScreen) >>= flip whenJust (windows . W.view)
+
+
+    
