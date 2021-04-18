@@ -3,7 +3,7 @@ import XMonad hiding((|||))
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
 import Data.Foldable(asum)
-import Data.Maybe(isJust)
+import Data.Maybe(isJust, fromMaybe)
 import System.Exit
 import XMonad.Prompt
 import XMonad.Prompt.Shell
@@ -38,6 +38,7 @@ import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
 import XMonad.Layout.AvoidFloats
 import XMonad.Layout.ThreeColumns
+import XMonad.Layout.Spacing
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers hiding(CW)
@@ -49,7 +50,7 @@ import XMonad.Util.NamedActions
 import System.IO
 import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
-import Data.List(isSuffixOf)
+import Data.List(isSuffixOf, stripPrefix)
 import XMonad.Util.NamedWindows (getName)
 
 import XMonad.Util.Themes
@@ -67,19 +68,21 @@ import qualified Codec.Binary.UTF8.String as UTF8
 --                                       , inactiveTextColor   = "#ffcc33"
 --                                       , fontName = ""
 --                                       }
-layout = toggleLayouts (noBorders simpleTabbedBottom) $ limitWindows 6 layout'
+layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) False
+       $ toggleLayouts (noBorders simpleTabbedBottom) 
+       $ (limitWindows 6 layout'
+     ||| name "Grid"  Grid)
 layout' = name "Dwindle" (ifWider 1000 (Dwindle R CW 1.5 1.1) (Squeeze D 2.5 1.1))
      ||| name "Hor" tiled
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
-     ||| name "Grid"  Grid
+     -- ||| name "Grid"  Grid
      ||| name "ThreeMid" (ThreeColMid 1 (3/100) (1/2))
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
-    name n = renamed [Replace n] . smartBorders
     -- tiled = Tall 2 (10/100) (1/2)
     -- tiled = Dishes 2 (10/100)
     tiled = GV.SplitGrid GV.L 1 2 (2/3) (10/10) (5/100)
@@ -87,6 +90,7 @@ layout' = name "Dwindle" (ifWider 1000 (Dwindle R CW 1.5 1.1) (Squeeze D 2.5 1.1
     tiledG = GV.SplitGrid GV.L 1 2 (9/10) (10/10) (5/100)
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
+name n = renamed [Replace n] . smartBorders
        
 extraWs = "abcdghijkmostuvxyz"
 
@@ -132,7 +136,8 @@ myDBusHook dbus =  do
     , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
     , ppVisible  = pangoColor "green" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
-   , ppLayout = \name -> pangoColor "blue" name ++ windowNumber
+   , ppLayout = \name -> let name' = fromMaybe name $ stripPrefix "Spacing " name
+                         in pangoColor "blue" name' ++ windowNumber 
   }
 
 -- Colorize according to tmux session
@@ -223,6 +228,7 @@ main = do
                      , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
                      , ("@q q", "Restart XMonad", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
                      , ("@q t", "Toggle Struts", sendMessage ToggleStruts ) -- workaround xmobar not showing on screen1
+                     , ("@q s", "Toggle Spacing", toggleWindowSpacingEnabled) 
                      , ("@l r", "Reset layouts", setLayout =<< asks (XMonad.layoutHook  . XMonad.config ))
                      , ("@ <Space>", "Prompt", runCommand commands')
                      , ("@ r", "Prompt", xmonadPromptC commands' xpConfig)
