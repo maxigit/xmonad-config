@@ -128,12 +128,30 @@ myDBusHook dbus =  do
                   (a,b) -> pangoColor "yellow" (show (a+1)) ++ pangoColor "darkred"  "/" ++ pangoColor "orange" ( show (a+b+1))
   dynamicLogWithPP $ (def)
     { ppOutput   = dbusOutput dbus
-    , ppTitle    = pangoSanitize
+    , ppTitle    = tweakTitle
     , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
     , ppVisible  = pangoColor "green" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
    , ppLayout = \name -> pangoColor "blue" name ++ windowNumber
   }
+
+-- Colorize according to tmux session
+tweakTitle :: String -> String
+tweakTitle ('!':s) = s -- raw don't sanitize
+tweakTitle (':':s0) = case splitAt 2 s0 of
+  ("0-", s ) -> pangoColors "#008888" "white" s0
+  ("1-", s ) -> pangoColors "#ff8800" "black" s0
+  ("2-", s ) -> pangoColors "#444444" "white" s0
+  ("3-", s ) -> pangoColors "#448800" "black" s0
+  ("4-", s ) -> pangoColors "#ffff00" "black" s0
+  ("5-", s ) -> pangoColors "#ff0000" "black" s0
+  ("6-", s ) -> pangoColors "#eb34cf" "white" s0
+  ("7-", s ) -> pangoColors "#0ef" "black" s0
+  ("8-", s ) -> pangoColors "#880000" "white" s0
+  ("9-", s ) -> pangoColors "#0000ff" "white" s0
+
+  _ -> pangoColors "white" "red" s0
+tweakTitle s = s
 main = do
   -- xmproc <- spawnPipe "xmobar"
     dbus <- D.connectSession
@@ -504,7 +522,7 @@ myManageHook = composeAll
 -- prettyPrinter :: D.Client -> PP
 prettyPrinter dbus = def
     { ppOutput   = dbusOutput dbus
-    , ppTitle    = pangoSanitize
+    , ppTitle    = \_ -> pangoColor "yellow" "panda"
     , ppCurrent  = pangoColor "green" . wrap "[" "]" . pangoSanitize
     , ppVisible  = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
     , ppHidden   = const ""
@@ -532,6 +550,13 @@ pangoColor fg = wrap left right
     left  = "<span foreground=\"" ++ fg ++ "\">"
     right = "</span>"
 
+pangoColors :: String-> String -> String -> String
+pangoColors bg fg = wrap left right
+  where
+    left  = "<span foreground=\"" ++ fg
+            ++ "\" background=\"" ++ bg
+            ++ "\">"
+    right = "</span>"
 pangoSanitize :: String -> String
 pangoSanitize = foldr sanitize ""
   where
