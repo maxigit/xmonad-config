@@ -634,6 +634,6 @@ myTitler ws w = do
   let currentTag = W.currentTag stackset
   name <- show `fmap` getName w
   if W.tag ws == currentTag
-   then return $ "-]  " ++ name
-   else return $ W.tag ws ++ "] " ++ name
+   then return $ "'" ++ W.tag ws ++ ") " ++ name
+   else return $ "," ++ W.tag ws ++ "] " ++ name
 
