@@ -181,7 +181,7 @@ main = do
                                                                       )
 
                        , modMask = modm     -- Rebind Mod to the Windows key
-                       , borderWidth = 1
+                       , borderWidth = 2
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
                        , normalBorderColor = "darkblue"
                        , workspaces = [ p <> ws
