@@ -300,6 +300,7 @@ main = do
                        , ("@ z S-v", "Split virtual monitor", myRescreen (makeVirtual 66))
                        , ("@ z S-z", "Split virtual monitor", myRescreen (makeVirtual 75))
                        , ("@ z w", "Split virtual monitor", myRescreen (makeVirtual3 ))
+                       , ("@ z S-w", "Split virtual monitor", myRescreen (makeVirtual3' ))
                        , ("@ z z", "Split virtual monitor", myRescreen (const id))
                        , ("@ z g", "Split virtual monitor", myRescreen makeVirtualGrid)
                        , ("@ z c", "Split virtual monitor", myRescreen makeVirtualCenter)
@@ -603,6 +604,8 @@ makeVirtual ratio _ (Rectangle x0 y0 w0 h0:recs) = let
   x2 = x0+fromIntegral w1+b
   in [Rectangle x0 y0 w1 h0, Rectangle x2 y0 (w0-w1-fromIntegral b) h0] ++ recs
 
+-- | 112
+--   113
 makeVirtual3 _ (Rectangle x0 y0 w0 h0:recs) = let
   w1 = w0 * 66 `div` 100
   b = 10
@@ -613,6 +616,19 @@ makeVirtual3 _ (Rectangle x0 y0 w0 h0:recs) = let
      , Rectangle x2 y0 (w0-w1-fromIntegral b) h2
      , Rectangle x2 (fromIntegral h2 + y0 + b) (w0-w1-fromIntegral b) h2
      ] ++ recs
+
+makeVirtual3' _ (Rectangle x0 y0 w0 h0:recs) = let
+  w1 = w0 * 66 `div` 100
+  b = 10
+  x2 = x0+fromIntegral w1+b
+  h3 = 160
+  h2 = h0 - fromIntegral b -h3 :: Dimension
+  in [ Rectangle x0 y0 w1 h0
+     -- , Rectangle x2 y0 (w0-w1-fromIntegral b) h2
+     , Rectangle x2 y0 (w0-w1-fromIntegral b) h2
+     , Rectangle x2 (fromIntegral h2 + y0 + b) (w0-w1-fromIntegral b) h3
+     ] ++ recs
+
   
 
 makeVirtualGrid :: [String] -> [Rectangle] -> [Rectangle]
