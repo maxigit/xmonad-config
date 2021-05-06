@@ -325,7 +325,7 @@ main = do
                             ,("r", ":r enter")
                             ,("S-r", "C-c :r enter")
                             ]
-              , (target, n)  <- ("2-", m ) : [ ("2-:dispatch="++c++"-", c) 
+              , (target, n)  <- ("2-", m ) : [ ("2-:*"++c++"-", c) 
                                              | c <- map show [0..9]
                                              ]
               ]
