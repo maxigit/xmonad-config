@@ -58,6 +58,7 @@ import XMonad.Util.Themes
 import qualified DBus as D
 import qualified DBus.Client as D
 import qualified Codec.Binary.UTF8.String as UTF8
+import XMonad.Hooks.EwmhDesktops 
 
 -- layout = toggleLayouts Full layout'
 -- full = tabbedBottom shrinkText def { activeColor         = "#115422"
@@ -424,7 +425,7 @@ main = do
         modm = mod4Mask
         confKeys = keys config
     -- xmonad $ config -- { keys = remap (mod1Mask, xK_space) confKeys  }
-    xmonad $ config { keys = myKeys}
+    xmonad $ ewmh $ config { keys = myKeys}
 
 
 remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
