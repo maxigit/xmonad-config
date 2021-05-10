@@ -322,13 +322,19 @@ main = do
               | (m, msg) <- [("m", "main enter")
                             ,("c", "C-c")
                             ,("a", "appMain enter")
-                            ,("", "up enter")
+                            ,("u", "up enter")
                             ,("r", ":r enter")
                             ,("S-r", "C-c :r enter")
                             ]
               , (target, n)  <- ("2-", m ) : [ ("2-:*"++c++"-", c) 
                                              | c <- map show [0..9]
                                              ]
+              ]
+           ++ -- tmux select window
+              [ ("@x " ++ show s ++ " " ++ show w, "Tmux select window " ++ show w ++ " for session " ++ show s
+                , spawn $ "tmux select-window -t" ++ show s ++ "-:" ++ show w)
+              | s <- [0..9]
+              , w <- [0..9]
               ]
            ++ -- Tmux session
               [ ("@a " ++ c, "Attach tmux session", spawn $ "gnome-terminal -- tmux attach-session -t" ++ c ++ "-")
