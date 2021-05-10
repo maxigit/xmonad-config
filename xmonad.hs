@@ -523,8 +523,9 @@ smallTopR = W.RationalRect (3/4) (2/8) (1/4) (1/8)
 
 myManageHook = composeAll
   [ appName =? "gvim" --> doRectFloat centerR 
-  , fmap (isSuffixOf "mium") appName --> doRectFloat centerR 
-  , appName =? "xvisbell" --> doRectFloat centerR ]
+  , fmap (isPrefixOf "Chromium") className --> doFloat -- doRectFloat centerR 
+  , appName =? "xvisbell" --> doRectFloat centerR 
+  ]
 
 
 -- from xmonad-log-applet
