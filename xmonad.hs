@@ -276,6 +276,7 @@ main = do
                        , ("@ a S-t", "terminal", spawn "gnome-terminal --profile=Dwarffortress") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "qutebrowser")
+                       , ("@ a l", "Libreoffice", spawn "libreoffice")
                        , ("@ '", "Qutebrowser open", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :open")
                        , ("@ a o", "Qutebrower quickmark", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :quickmark-load")
                        , ("@ a s", "Spotify", spawn "spotify")
