@@ -607,9 +607,9 @@ myRescreen  f = do
                , W.hidden  = ys }
 
 -- makeVirtual :: Word32 -> [Rectangle] -> [Rectangle]
+b = 2
 makeVirtual ratio _ (Rectangle x0 y0 w0 h0:recs) = let
   w1 = w0 * ratio `div` 100
-  b = 10
   x2 = x0+fromIntegral w1+b
   in [Rectangle x0 y0 w1 h0, Rectangle x2 y0 (w0-w1-fromIntegral b) h0] ++ recs
 
@@ -617,7 +617,6 @@ makeVirtual ratio _ (Rectangle x0 y0 w0 h0:recs) = let
 --   113
 makeVirtual3 _ (Rectangle x0 y0 w0 h0:recs) = let
   w1 = w0 * 66 `div` 100
-  b = 10
   x2 = x0+fromIntegral w1+b
   h2 = (h0 - fromIntegral b ) `div` 2 :: Dimension
   in [ Rectangle x0 y0 w1 h0
@@ -628,7 +627,6 @@ makeVirtual3 _ (Rectangle x0 y0 w0 h0:recs) = let
 
 makeVirtual3' _ (Rectangle x0 y0 w0 h0:recs) = let
   w1 = w0 * 66 `div` 100
-  b = 10
   x2 = x0+fromIntegral w1+b
   h3 = 160
   h2 = h0 - fromIntegral b -h3 :: Dimension
