@@ -73,14 +73,15 @@ layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) False
        $ toggleLayouts (noBorders simpleTabbedBottom) 
        $ (limitWindows 6 layout'
      ||| name "Grid"  Grid)
-layout' = name "Dwindle" (ifWider 1000 (Dwindle R CW 1.5 1.1) (Squeeze D 2.5 1.1))
-     ||| name "Hor" tiled
+layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5 1.1)) -- (Squeeze D 2.5 1.1))
+     ||| name "Hor" (ifWider 1199 tiled (Mirror tiled))
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
      ||| name "HorG" tiledG
      ||| name "VerG" (Mirror tiledG)
      -- ||| name "Grid"  Grid
-     ||| name "ThreeMid" (ThreeColMid 1 (3/100) (1/2))
+     ||| name "ThreeMid" (ifWider 1199 (ThreeColMid 1 (3/100) (1/2))
+                                       (Mirror (ThreeColMid 1 (3/100) (1/2))))
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
@@ -134,8 +135,8 @@ myDBusHook dbus =  do
   dynamicLogWithPP $ (def)
     { ppOutput   = dbusOutput dbus
     , ppTitle    = tweakTitle
-    , ppCurrent  = (if null (take 1 copies) then pangoColor "green" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
-    , ppVisible  = pangoColor "green" . {- wrap "(" ")" . -} pangoSanitize
+    , ppCurrent  = (if null (take 1 copies) then pangoColor "lightgreen" else pangoColor "orange") . wrap "[" "]" . pangoSanitize 
+    , ppVisible  = pangoColor "lightgreen" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
    , ppLayout = \name -> let name' = fromMaybe name $ stripPrefix "Spacing " name
                          in pangoColor "blue" name' ++ windowNumber 
@@ -326,6 +327,8 @@ main = do
                             ,("u", "up enter")
                             ,("r", ":r enter")
                             ,("S-r", "C-c :r enter")
+                            ,("S-u", "C-c up enter")
+                            ,("enter", "enter")
                             ]
               , (target, n)  <- ("2-", m ) : [ ("2-:*"++c++"-", c) 
                                              | c <- map show [0..9]
@@ -681,6 +684,3 @@ lastScreen = do
        [] -> return ()
        (nextScreen:_) -> do
           screenWorkspace (W.screen nextScreen) >>= flip whenJust (windows . W.view)
-
-
-    
