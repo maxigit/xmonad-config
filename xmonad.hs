@@ -39,6 +39,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.AvoidFloats
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spacing
+import XMonad.Layout.LayoutBuilder
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers hiding(CW)
@@ -47,6 +48,7 @@ import XMonad.Hooks.FadeWindows(isFloating)
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap, mkKeymap)
 import XMonad.Util.NamedActions
+import XMonad.Util.WindowProperties as P
 import System.IO
 import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
@@ -83,6 +85,7 @@ layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5
      ||| name "ThreeMid" (ifWider 1199 (ThreeColMid 1 (3/100) (1/2))
                                        (Mirror (ThreeColMid 1 (3/100) (1/2))))
      ||| name "Dishes" (Dishes 2 (1/6))
+     ||| name "SilQ" silq
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
@@ -93,6 +96,17 @@ layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5
     tiledG = GV.SplitGrid GV.L 1 2 (9/10) (10/10) (5/100)
     g= 1.61 -- Golden ratio
     twoP = TwoPane (3/100) (1/2)
+    -- nethack = layoutN 3 (relBox 0 0 0.5 1) Nothing
+    --                 (Dishes 1 (1/6))
+    --                 $ layoutAll (relBox 0.5 0 1 1) (Dishes 2 (3/4))
+    silq = layoutP (P.Title "Sil-Q") (relBox 0 0 0.5 0.6) Nothing Full
+            $ layoutP (P.Title "Combat Rolls") (relBox 0 0.6 0.5 0.50) Nothing Full
+            $ layoutP (P.Title "Messages") (relBox 0 0.8 0.3 1) Nothing Full
+            $ layoutP (P.Title "Monster List") (relBox 0.3 0.8 0.5 1) Nothing Full
+            $ layoutP (P.Title "Equipment") (relBox 0.5 0 0.5 0.5) Nothing Full
+            $ layoutP (P.Title "Inventory") (relBox 0.75 0 1 0.5) Nothing Full
+            $ layoutP (P.Title "Recall") (relBox 0.5 0.5 1 0.5) Nothing Full
+            $ layoutAll (relBox 0.5 0.75 1 1) (Dishes 2 (1/2))
 name n = renamed [Replace n] . smartBorders
        
 extraWs = "abcdghijkmostuvxyz"
@@ -218,7 +232,8 @@ main = do
                      , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
                      , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
                      , ("@S-c", "Three", sendMessage $ JumpToLayout "ThreeMid")
-                     , ("@C-v", "Dishes", sendMessage $ JumpToLayout "Dishes")
+                     , ("@C-v d", "Dishes", sendMessage $ JumpToLayout "Dishes")
+                     , ("@C-v s", "SilQ", sendMessage $ JumpToLayout "SilQ")
                    -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
                      , ("@1", "Full Screen", setLimit 1)
                      , ("@2", "Two Panes Limit", setLimit 2)
@@ -537,6 +552,7 @@ myManageHook = composeAll
   [ appName =? "gvim" --> doRectFloat centerR 
   , fmap (isPrefixOf "Chromium") className --> doRectFloat centerR 
   , appName =? "xvisbell" --> doRectFloat centerR 
+  -- , className =? "Sil-Q" --> doCenterFloat -- doRectFloat centerR 
   ]
 
 
