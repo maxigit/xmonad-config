@@ -32,7 +32,7 @@ import XMonad.Layout.Grid as Grid
 import qualified XMonad.Layout.GridVariants as GV
 import XMonad.Layout.Tabbed
 import XMonad.Layout.PerScreen(ifWider)
--- import XMonad.Layout.Dishes
+import XMonad.Layout.Dishes
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
@@ -82,6 +82,7 @@ layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5
      -- ||| name "Grid"  Grid
      ||| name "ThreeMid" (ifWider 1199 (ThreeColMid 1 (3/100) (1/2))
                                        (Mirror (ThreeColMid 1 (3/100) (1/2))))
+     ||| name "Dishes" (Dishes 2 (1/6))
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
   where
@@ -217,6 +218,7 @@ main = do
                      , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
                      , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
                      , ("@S-c", "Three", sendMessage $ JumpToLayout "ThreeMid")
+                     , ("@C-v", "Dishes", sendMessage $ JumpToLayout "Dishes")
                    -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
                      , ("@1", "Full Screen", setLimit 1)
                      , ("@2", "Two Panes Limit", setLimit 2)
