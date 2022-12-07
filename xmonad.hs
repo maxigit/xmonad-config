@@ -370,9 +370,9 @@ main = do
            ++ -- Workspaces operations
                    [ (key ++ show i, description ++ show i, sequence_ $ map windows (map ($show i) command))
                    | i <- [1..9] :: [Int]
-           , (key, description, command) <- [ ("M1-",  "Switch to ", [W.greedyView])
+           , (key, description, command) <- [ ("M-",  "Switch to ", [W.greedyView])
                                 , ("@ l ", "Layer ", [W.greedyView])
-                                , ("M1-S-", "Shift (push) ", [W.shift])
+                                , ("M-S-", "Shift (push) ", [W.shift])
                                 , ("@ S-p ", "Push ", [W.shift])
                                  , ("@ p ",  "Push and go ", [W.shift, W.greedyView])
                                      , ("@ S-t ", "Put ", [copy])
