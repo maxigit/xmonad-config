@@ -117,10 +117,31 @@ myXmobarHook xmproc =  do
   -- print in red workspace containing a copy of the focuse window
   let checkTag ws | ws `elem` copies = xmobarColor "orange" "black" $ pad ws 
                   | otherwise = pad ws
+  wset <- gets windowset
+  let windowNumber = 
+        case W.stack $ W.workspace (W.current wset) of
+            Nothing -> ""
+            Just (W.Stack _ u d) ->
+                case (length u, length d) of
+                  (0,0) -> "" -- 1
+                  (0,1) -> xmobarColor "blue" "black" " ½"
+                  (1,0) -> xmobarColor "blue" "black" " 2"
+                  (0,2) -> xmobarColor "red" "black" " ⅓"
+                  (1,1) -> xmobarColor "red" "black" " ⅔"
+                  (2,0) -> xmobarColor "red" "black" " 3"
+                  (0,3) -> xmobarColor "orange" "black" " ¼"
+                  (1,2) -> xmobarColor "orange" "black" " ²"
+                  (2,1) -> xmobarColor "orange" "black" " ¾"
+                  (3,0) -> xmobarColor "orange" "black" " 4"
+                  (a,b) -> xmobarColor "yellow" "black" (show (a+1)) ++ xmobarColor "darkred" "black"  "/" ++ xmobarColor "orange" "black" ( show (a+b+1))
   dynamicLogWithPP xmobarPP
         { ppOutput = hPutStrLn xmproc
-        , ppTitle = xmobarColor "green" "" . shorten 50
-        , ppHidden = checkTag
+    , ppTitle    = tweakTitle
+    , ppCurrent  = (if null (take 1 copies) then xmobarColor "lightgreen" "black" else xmobarColor "orange" "black") . wrap "[" "]" . pangoSanitize 
+    , ppVisible  = xmobarColor "lightgreen" "black" . {- wrap "(" ")" . -} pangoSanitize
+   , ppHidden = checkTag
+   , ppLayout = \name -> let name' = fromMaybe name $ stripPrefix "Spacing " name
+                         in xmobarColor "blue" "black" name' ++ windowNumber 
         }
 
 myDBusHook dbus =  do
@@ -175,9 +196,9 @@ tweakTitle (':':s0) = case splitAt 2 s0 of
   _ -> pangoColors "white" "red" s0
 tweakTitle s = s
 main = do
-  -- xmproc <- spawnPipe "xmobar"
-    dbus <- D.connectSession
-    getWellKnownName dbus
+    xmproc <- spawnPipe "xmobar"
+    -- dbus <- D.connectSession
+    -- getWellKnownName dbus
     _ <- spawn "xvisbell"
 
     let config =  docks $ def
@@ -185,17 +206,18 @@ main = do
                        , startupHook = adjustEventInput
                        , handleEventHook = focusOnMouseMove
                        , layoutHook = avoidFloats $ avoidStruts layout
-                       , logHook = myDBusHook dbus <+> fadeOutLogHook (
-                          do
-                            unfocused <- isUnfocused
-                            if unfocused
-                              then do
-                                floating <- isFloating
-                                if floating
-                                  then return 0.6
-                                  else return 0.95 -- 0.85
-                              else return 1
-                                                                      )
+                       , logHook = myXmobarHook xmproc
+                       -- , logHook = myDBusHook dbus <+> fadeOutLogHook (
+                       --    do
+                       --      unfocused <- isUnfocused
+                       --      if unfocused
+                       --        then do
+                       --          floating <- isFloating
+                       --          if floating
+                       --            then return 0.6
+                       --            else return 0.95 -- 0.85
+                       --        else return 1
+                       --                                                )
 
                        , modMask = modm     -- Rebind Mod to the Windows key
                        , borderWidth = 2
@@ -452,7 +474,7 @@ main = do
         modm = mod4Mask
         confKeys = keys config
     -- xmonad $ config -- { keys = remap (mod1Mask, xK_space) confKeys  }
-    xmonad $ ewmh $ config { keys = myKeys}
+    xmonad $  config { keys = myKeys}
 
 
 remap mod keys k = let keys' k = M.mapKeys resetModifier (keys k)
