@@ -315,9 +315,11 @@ main = do
                        , ("@ s t", "Search in Dictionary", promptSearch' xpConfig stackage)
                        , ("@ s f", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-12.26" "http://stackage.org/lts-12.26/hoogle?q=")
                        , ("@ s m", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-10.9" "http://stackage.org/lts-10.9/hoogle?q=")
-                   -- virtual moitnor
-                       , ("@ z v", "Split virtual monitor", myRescreen (makeVirtual 50))
-                       , ("@ z S-v", "Split virtual monitor", myRescreen (makeVirtual 66))
+                   -- virtual monitor
+                       , ("@ z v", "Split virtual monitor", myRescreen (makeHorizontal 50))
+                       , ("@ z S-v", "Split virtual monitor", myRescreen (makeHorizontal 66))
+                       , ("@ z h", "Split virtual monitor", myRescreen (makeVirtual 50))
+                       , ("@ z S-h", "Split virtual monitor", myRescreen (makeVirtual 66))
                        , ("@ z S-z", "Split virtual monitor", myRescreen (makeVirtual 75))
                        , ("@ z w", "Split virtual monitor", myRescreen (makeVirtual3 ))
                        , ("@ z S-w", "Split virtual monitor", myRescreen (makeVirtual3' ))
@@ -633,6 +635,11 @@ makeVirtual ratio _ (Rectangle x0 y0 w0 h0:recs) = let
   w1 = w0 * ratio `div` 100
   x2 = x0+fromIntegral w1+b
   in [Rectangle x0 y0 w1 h0, Rectangle x2 y0 (w0-w1-fromIntegral b) h0] ++ recs
+
+makeHorizontal ratio _ (Rectangle x0 y0 w0 h0:recs) = let
+  h1 = h0 * ratio `div` 100
+  y2 = y0+fromIntegral h1+b
+  in [Rectangle x0 y0 w0 h1, Rectangle x0 y2 w0 (h0-h1-fromIntegral b)] ++ recs
 
 -- | 112
 --   113
