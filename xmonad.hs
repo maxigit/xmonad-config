@@ -630,7 +630,7 @@ myRescreen  f = do
                , W.hidden  = ys }
 
 -- makeVirtual :: Word32 -> [Rectangle] -> [Rectangle]
-b = 2
+b = 6
 makeVirtual ratio _ (Rectangle x0 y0 w0 h0:recs) = let
   w1 = w0 * ratio `div` 100
   x2 = x0+fromIntegral w1+b
