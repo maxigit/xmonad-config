@@ -123,6 +123,15 @@ myXmobarHook xmproc =  do
         , ppHidden = checkTag
         }
 
+windowBar :: Int -> Int -> String
+windowBar current total = concat $ 
+  [ if i == current
+    then pangoColor (if i == total then "orange" else "yellow") (show i)
+    else if i == total 
+         then pangoColor "darkred" (show i)
+         else "-" -- pangoColor "yellow" "-"
+  | i <- [1..total]
+  ]
 myDBusHook dbus =  do
   -- workspace containing the focused window
   copies <- wsContainingCopies
@@ -134,19 +143,9 @@ myDBusHook dbus =  do
   let windowNumber = 
         case W.stack $ W.workspace (W.current wset) of
             Nothing -> ""
-            Just (W.Stack _ u d) ->
-                case (length u, length d) of
-                  (0,0) -> "" -- 1
-                  (0,1) -> pangoColor "blue" " ½"
-                  (1,0) -> pangoColor "blue" " 2"
-                  (0,2) -> pangoColor "red" " ⅓"
-                  (1,1) -> pangoColor "red" " ⅔"
-                  (2,0) -> pangoColor "red" " 3"
-                  (0,3) -> pangoColor "orange" " ¼"
-                  (1,2) -> pangoColor "orange" " ²"
-                  (2,1) -> pangoColor "orange" " ¾"
-                  (3,0) -> pangoColor "orange" " 4"
-                  (a,b) -> pangoColor "yellow" (show (a+1)) ++ pangoColor "darkred"  "/" ++ pangoColor "orange" ( show (a+b+1))
+            Just (W.Stack _ u d) -> let current = length u
+                                        other = length d
+                                    in windowBar (current+1) (current+other+1)
   dynamicLogWithPP $ (def)
     { ppOutput   = dbusOutput dbus
     , ppTitle    = tweakTitle
