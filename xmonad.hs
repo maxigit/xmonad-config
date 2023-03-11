@@ -146,6 +146,18 @@ myDBusHook dbus =  do
             Just (W.Stack _ u d) -> let current = length u
                                         other = length d
                                     in windowBar (current+1) (current+other+1)
+      -- tweak "Dwindle" = "ට" -- ꖸ
+      tweak "Dwindle" = "ꖸ"
+      tweak "ThreeMid" = "ℿ"
+      tweak "Dishes" = "⌸"
+      tweak "Hor" = "◧"
+      tweak "Ver" = "⬒"
+      tweak "HorG" = "◧'"
+      tweak "VerG" = "⬒'"
+      tweak "Grid" = "𐌎"
+      tweak "Tabbed Bottom Simplest" = "⎕"
+      tweak "SilQ" = "ℚ"
+      tweak n = n
   dynamicLogWithPP $ (def)
     { ppOutput   = dbusOutput dbus
     , ppTitle    = tweakTitle
@@ -153,7 +165,7 @@ myDBusHook dbus =  do
     , ppVisible  = pangoColor "lightgreen" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
    , ppLayout = \name -> let name' = fromMaybe name $ stripPrefix "Spacing " name
-                         in pangoColor "blue" name' ++ windowNumber 
+                         in pangoColor "steelblue" (tweak name') ++" "  ++ windowNumber 
   }
 
 -- Colorize according to tmux session
