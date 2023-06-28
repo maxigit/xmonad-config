@@ -337,6 +337,7 @@ main = do
                        , ("@ z z", "Split virtual monitor", myRescreen (const id))
                        , ("@ z g", "Split virtual monitor", myRescreen makeVirtualGrid)
                        , ("@ z c", "Split virtual monitor", myRescreen makeVirtualCenter)
+                       , ("@ z S-c", "Split virtual monitor", myRescreen makeVirtual3Column)
                    -- workspaces
                        , ("@ l l", "Toggle to previous Workspace ", toggleWS)
                        , ("@ l n", "Switch to next (non-empty) workspace ", moveTo Next NonEmptyWS  )
@@ -675,6 +676,14 @@ makeVirtual3' _ (Rectangle x0 y0 w0 h0:recs) = let
      , Rectangle x2 (fromIntegral h2 + y0 + b) (w0-w1-fromIntegral b) h3
      ] ++ recs
 
+makeVirtual3Column _ (Rectangle x0 y0 w0 h0:recs) = let
+  w1 = w0 * 33 `div` 100
+  x2 = x0+fromIntegral w1+b
+  x3 = x2+fromIntegral w1+b
+  in [ Rectangle x2 y0 (w1-fromIntegral b) h0
+     , Rectangle x0 y0 w1 h0
+     , Rectangle x3 y0 (w1-fromIntegral b) h0
+     ] ++ recs
   
 
 makeVirtualGrid :: [String] -> [Rectangle] -> [Rectangle]
