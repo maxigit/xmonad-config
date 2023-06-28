@@ -684,10 +684,13 @@ makeVirtualGrid ws (r:recs) =  let
   in  map snd grids ++ recs
 
 makeVirtualCenter :: [String] -> [Rectangle]  -> [Rectangle]
-makeVirtualCenter ws recs = 
-  let l = Rectangle 0 0 320 1080
-      m = Rectangle 320 0 1920  1080
-      r = Rectangle (1920+320) 0 320 1080
+makeVirtualCenter ws (rec:_) = 
+  let l = Rectangle 0 0 padding height
+      m = Rectangle (fromIntegral padding) 0 width  height
+      r = Rectangle (fromIntegral $ width+padding) 0 padding height
+      height = rect_height rec
+      width = 1920
+      padding = (rect_width rec - width) `div` 2
   in case length $ filter (`elem` map show [1..9]) ws  of
     1 -> [m]
     2 -> [m,r]
