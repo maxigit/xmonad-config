@@ -694,9 +694,9 @@ makeVirtualGrid ws (r:recs) =  let
 
 makeVirtualCenter :: [String] -> [Rectangle]  -> [Rectangle]
 makeVirtualCenter ws (rec:_) = 
-  let l = Rectangle 0 0 padding height
+  let l = Rectangle 0 0 (padding - fromIntegral b) height
       m = Rectangle (fromIntegral padding) 0 width  height
-      r = Rectangle (fromIntegral $ width+padding) 0 padding height
+      r = Rectangle (fromIntegral $ width+padding+ fromIntegral b) 0 (padding - fromIntegral b) height
       height = rect_height rec
       width = 1920
       padding = (rect_width rec - width) `div` 2
