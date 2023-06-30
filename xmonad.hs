@@ -26,6 +26,7 @@ import XMonad.Actions.WithAll hiding (killAll)
        -- to enable layout jump
 import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
+import XMonad.Layout.IfMax
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Grid as Grid
@@ -73,6 +74,13 @@ import XMonad.Hooks.EwmhDesktops
 --                                       }
 layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) False
        $ toggleLayouts (noBorders simpleTabbedBottom) 
+       $ ifMax 1 (ifWider 3000
+                          (layoutAll (relBox 0.0 0 0.60 1) Full)
+                          (ifWider 2000
+                                   (layoutAll (absBox 330 0 1900 1200) Full)
+                                   Full
+                          )
+                 )
        $ (limitWindows 6 layout'
      ||| name "Grid"  Grid)
 layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5 1.1)) -- (Squeeze D 2.5 1.1))
