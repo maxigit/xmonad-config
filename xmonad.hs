@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 import XMonad hiding((|||))
+import Data.Monoid(Endo(..))
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
 import Data.Foldable(asum)
@@ -46,6 +47,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers hiding(CW)
 import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.FadeWindows(isFloating)
+import qualified XMonad.Hooks.ToggleHook as TH
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap, mkKeymap)
 import XMonad.Util.NamedActions
@@ -173,7 +175,7 @@ myDBusHook dbus =  do
     , ppVisible  = pangoColor "lightgreen" . {- wrap "(" ")" . -} pangoSanitize
    , ppHidden = checkTag
    , ppLayout = \name -> let name' = fromMaybe name $ stripPrefix "Spacing " name
-                         in pangoColor "steelblue" (tweak name') ++" "  ++ windowNumber 
+                         in pangoColor "steelblue" (tweak name') ++" "  ++ windowNumber
   }
 
 -- Colorize according to tmux session
@@ -313,6 +315,7 @@ main = do
                        , ("@ a S-t", "terminal", spawn "gnome-terminal --profile=Dwarffortress") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
                        , ("@ a f", "Firefox", spawn "qutebrowser")
+                       , ("@ a S-f", "Firefox", TH.hookNext "swapNext" True >> spawn "qutebrowser")
                        , ("@ a l", "Libreoffice", spawn "libreoffice")
                        , ("@ '", "Qutebrowser open", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :open")
                        , ("@ a o", "Qutebrower quickmark", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :quickmark-load")
@@ -383,9 +386,10 @@ main = do
               [ ("@a " ++ c, "Attach tmux session", spawn $ "gnome-terminal -- tmux attach-session -t" ++ c ++ "-")
               | c <- map show [0..9]
               ]
-           ++ [ ("@a S-" ++ c, "Attach tmux session (Read only)", spawn $ "gnome-terminal --profile=dark -- tmux attach-session -t" ++ c ++ "-")
+           ++ [ ("@a S-" ++ c, "Attach tmux session (Read only)", TH.hookNext "swapNext"  True  >> (spawn $ "gnome-terminal --profile=dark -- tmux attach-session -t" ++ c ++ "-"))
               | c <- map show [0..9]
               ]
+           ++ [ ("@C-n", "Swap next", TH.hookNext "swapNext" True) ]
            ++ [ ("@ k " ++ c, "Kill from workspace", killForeigns (Just c))
               | c <- map show [1..9] ++ map (:[]) extraWs
               ]
@@ -575,6 +579,9 @@ myManageHook = composeAll
   , fmap (isPrefixOf "Chromium") className --> doRectFloat centerR 
   , appName =? "xvisbell" --> doRectFloat centerR 
   -- , className =? "Sil-Q" --> doCenterFloat -- doRectFloat centerR 
+  -- , TH.toggleHook "swapNext" (pure $ Endo W.swapUp)
+  -- , TH.toggleHook "swapNext" doFloat
+  , TH.toggleHook "swapNext" (pure $ Endo swapMasterOrShift)
   ]
 
 
