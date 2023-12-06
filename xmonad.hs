@@ -31,6 +31,8 @@ import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.IfMax
 import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.TwoPane
+import XMonad.Layout.Groups.Examples
+import qualified XMonad.Layout.Groups.Helpers as Group
 import XMonad.Layout.Grid as Grid
 import qualified XMonad.Layout.GridVariants as GV
 import XMonad.Layout.Tabbed
@@ -101,6 +103,7 @@ layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5
      ||| name "SilQ" silq
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
+     ||| name "rowOfColumns" rowOfColumns
   where
     -- tiled = Tall 2 (10/100) (1/2)
     -- tiled = Dishes 2 (10/100)
@@ -258,6 +261,7 @@ main = do
                      , ("@S-c", "Three", sendMessage $ JumpToLayout "ThreeMid")
                      , ("@C-v d", "Dishes", sendMessage $ JumpToLayout "Dishes")
                      , ("@C-v s", "SilQ", sendMessage $ JumpToLayout "SilQ")
+                     , ("@C-v r", "SilQ", sendMessage $ JumpToLayout "rowOfColumns")
                    -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
                      , ("@1", "Full Screen", setLimit 1)
                      , ("@2", "Two Panes Limit", setLimit 2)
@@ -362,6 +366,12 @@ main = do
                        , ("@ l S-p", "Switch to previous Workspace ", prevWS )
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
+                   -- Groups 
+                       , ("M-h", "Group swap up", Group.swapUp)
+                       , ("M-t", "Group swap down", Group.swapDown)
+                       , ("M-d", "Group move up", Group.moveToGroupUp True)
+                       , ("M-l", "Group move dovn", Group.moveToGroupDown True)
+                       , ("M-s", "Split", Group.splitGroup)
                    ]
            ++ -- tmux messages
               [ ("@x "++m++" "++n, "tmux send " ++ show msg ++ " -> " ++ target
