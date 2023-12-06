@@ -1,10 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
 import XMonad hiding((|||))
 import Data.Monoid(Endo(..))
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
 import Data.Foldable(asum)
-import Data.Maybe(isJust, fromMaybe)
+import Data.Maybe(isJust, fromMaybe, fromJust)
 import System.Exit
 import XMonad.Prompt
 import XMonad.Prompt.Shell
@@ -37,6 +38,7 @@ import XMonad.Layout.PerScreen(ifWider)
 import XMonad.Layout.Dishes
 import XMonad.Layout.Dwindle
 import XMonad.Layout.LimitWindows
+import XMonad.Layout.LayoutModifier
 import XMonad.Layout.NoBorders
 import XMonad.Layout.AvoidFloats
 import XMonad.Layout.ThreeColumns
@@ -83,6 +85,7 @@ layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) False
        --                             Full
        --                    )
        --           )
+       -- $ ModifiedLayout (MinWindow 3)
        $ (limitWindows 6 layout'
      ||| name "Grid"  Grid)
 layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5 1.1)) -- (Squeeze D 2.5 1.1))
@@ -314,7 +317,7 @@ main = do
                        , ("@ a t", "terminal", spawn "gnome-terminal") -- =<< asks (terminal . XMonad.config))
                        , ("@ a S-t", "terminal", spawn "gnome-terminal --profile=Dwarffortress") -- =<< asks (terminal . XMonad.config))
                        , ("@ a r", "terminal", spawn "roxterm") -- =<< asks (terminal . XMonad.config))
-                       , ("@ a f", "Firefox", spawn "qutebrowser")
+                       , ("@ a f", "Firefox", spawn "qutebrowser qute://help/changelog.html")
                        , ("@ a S-f", "Firefox", TH.hookNext "swapNext" True >> spawn "qutebrowser")
                        , ("@ a l", "Libreoffice", spawn "libreoffice")
                        , ("@ '", "Qutebrowser open", spawn "qutebrowser --target window ' ' :set-cmd-text\\ -s\\ :open")
@@ -338,6 +341,7 @@ main = do
                        , ("@ s f", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-12.26" "http://stackage.org/lts-12.26/hoogle?q=")
                        , ("@ s m", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-10.9" "http://stackage.org/lts-10.9/hoogle?q=")
                    -- virtual monitor
+                       , ("@ z d", "Split virtual monitor", myRescreen (\_ r -> r ++ [ Rectangle 2560 0 800 320]))
                        , ("@ z v", "Split virtual monitor", myRescreen (makeHorizontal 50))
                        , ("@ z S-v", "Split virtual monitor", myRescreen (makeHorizontal 66))
                        , ("@ z h", "Split virtual monitor", myRescreen (makeVirtual 50))
@@ -747,3 +751,23 @@ lastScreen = do
        [] -> return ()
        (nextScreen:_) -> do
           screenWorkspace (W.screen nextScreen) >>= flip whenJust (windows . W.view)
+          
+          
+-- {{{ 
+data MinWindow a = MinWindow Int  deriving (Show, Read)
+
+instance LayoutModifier MinWindow a where
+   modifyLayout (MinWindow n) wrs rect = do 
+    -- add to down if needed
+    let limit stack = let
+              ws = W.integrate stack
+              nwindows = length ws
+              missing = max 0 (n - nwindows)
+              -- in stack {W.down = replicate missing (W.focus stack) ++ W.down stack}
+              in fromJust $ W.differentiate $ ws ++ replicate missing (last ws)
+    
+    
+    (newRec, _) <- runLayout (wrs { W.stack = fmap limit (W.stack wrs) }) rect
+    (_, newLayout) <- runLayout wrs rect
+    return (reverse newRec, Nothing)
+    
