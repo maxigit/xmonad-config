@@ -104,6 +104,7 @@ layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5
      -- ||| name "Hor2" twoP
      -- ||| name "Ver2" (Mirror twoP)
      ||| name "rowOfColumns" rowOfColumns
+     ||| name "tallTabs" (tallTabs def)
   where
     -- tiled = Tall 2 (10/100) (1/2)
     -- tiled = Dishes 2 (10/100)
@@ -262,6 +263,7 @@ main = do
                      , ("@C-v d", "Dishes", sendMessage $ JumpToLayout "Dishes")
                      , ("@C-v s", "SilQ", sendMessage $ JumpToLayout "SilQ")
                      , ("@C-v r", "SilQ", sendMessage $ JumpToLayout "rowOfColumns")
+                     , ("@C-v t", "SilQ", sendMessage $ JumpToLayout "tallTabs")
                    -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
                      , ("@1", "Full Screen", setLimit 1)
                      , ("@2", "Two Panes Limit", setLimit 2)
@@ -367,11 +369,26 @@ main = do
                        , ("@ p e", "Push and go to empty workspace", tagToEmptyWorkspace)
                        , ("@ S-p e", "Push to empty workspace", sendToEmptyWorkspace)
                    -- Groups 
-                       , ("M-h", "Group swap up", Group.swapUp)
-                       , ("M-t", "Group swap down", Group.swapDown)
-                       , ("M-d", "Group move up", Group.moveToGroupUp True)
-                       , ("M-l", "Group move dovn", Group.moveToGroupDown True)
+                       , ("M-t", "Group swap up", Group.swapUp)
+                       , ("M-h", "Group swap down", Group.swapDown)
+                       , ("M-d", "Group move up", Group.moveToGroupUp False)
+                       , ("M-l", "Group move dovn", Group.moveToGroupDown False)
+                       , ("M-c", "Group move new up", Group.moveToNewGroupUp)
+                       , ("M-g", "Group move new dovn", Group.moveToNewGroupDown)
+                       , ("M-m", "Swap Master", Group.swapMaster)
+                       , ("M-f", "toggle full column", toggleColumnFull)
+                       , ("M-z", "toggle full column", toggleWindowFull)
                        , ("M-s", "Split", Group.splitGroup)
+                       , ("M-b t", "swap group up", Group.swapGroupUp)
+                       , ("M-b h", "swap group down", Group.swapGroupDown)
+                       , ("M-b m", "swap master group", Group.swapGroupMaster)
+                       , ("M-b d", "focus group up", Group.focusGroupUp)
+                       , ("M-b l", "focus group down", Group.focusGroupDown)
+                       , ("M-b ,", "decrease master group", decreaseNMasterGroups)
+                       , ("M-b .", "increase master group", increaseNMasterGroups)
+                       , ("M-b S-,", "shrink master area", shrinkMasterGroups)
+                       , ("M-b S-.", "increase master group", expandMasterGroups)
+                       , ("M-b M-b", "next outer layout", nextOuterLayout)
                    ]
            ++ -- tmux messages
               [ ("@x "++m++" "++n, "tmux send " ++ show msg ++ " -> " ++ target
