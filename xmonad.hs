@@ -82,7 +82,7 @@ import XMonad.Hooks.EwmhDesktops
 --                                       , fontName = ""
 --                                       }
 layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
-       $ toggleLayouts (noBorders simpleTabbedBottom) 
+       $ toggleLayouts (limitWindows 2 $ makeToggle bareLayout)
        -- $ ifMax 1 (ifWider 3000
        --                    (layoutAll (relBox 0.0 0 0.60 1) Full)
        --                    (ifWider 2000
@@ -283,6 +283,8 @@ main = do
                      , ("@5", "Decrease limit", decreaseLimit)
                      , ("@6", "Two Pane Layout", setLimit 6)
                      , ("@7", "Increase limit", increaseLimit)
+                     , ("@8", "Increase limit", setLimit 20)
+                     , ("@<Tab>", "Toggle", sendMessage ToggleLayout)
                    -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
                      , ("@q S-q", "Quit XMonad", io (exitWith ExitSuccess))
