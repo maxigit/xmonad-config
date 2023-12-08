@@ -30,6 +30,9 @@ import XMonad.Layout.LayoutCombinators -- ((|||), JumpToLayout)
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.IfMax
 import XMonad.Layout.ToggleLayouts
+import qualified XMonad.Layout.MultiToggle as MT
+import qualified XMonad.Layout.MultiToggle.Instances as MT
+import qualified XMonad.Layout.Reflect as RT
 import XMonad.Layout.TwoPane
 import XMonad.Layout.Groups.Examples
 import qualified XMonad.Layout.Groups.Helpers as Group
@@ -88,9 +91,14 @@ layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) False
        --                    )
        --           )
        -- $ ModifiedLayout (MinWindow 3)
-       $ (limitWindows 6 layout'
+       $ (limitWindows 6 $ makeToggle bareLayout
      ||| name "Grid"  Grid)
-layout' = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5 1.1)) -- (Squeeze D 2.5 1.1))
+
+makeToggle = MT.mkToggle1 MT.NBFULL
+           . MT.mkToggle1 MT.MIRROR
+           . MT.mkToggle1 RT.REFLECTY
+           . MT.mkToggle1 RT.REFLECTX
+bareLayout = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 2.5 1.1)) -- (Squeeze D 2.5 1.1))
      ||| name "Hor" (ifWider 1199 tiled (Mirror tiled))
      ||| name "Ver" (Mirror tiled)
      -- ||| name "Full" Full
@@ -252,10 +260,13 @@ main = do
         -- @ will be replace by the "leader"
         commands = [
                    -- layout
-                       ("@f", "Full" , (sendMessage $ ToggleLayout)) -- >> sendMessage ToggleStruts)
+                       ("@f", "Full" , (sendMessage $ MT.Toggle MT.NBFULL)) -- >> sendMessage ToggleStruts)
                      , ("@S-f", "Grid" , sendMessage $ JumpToLayout "Grid")
                      , ("@h", "Horizontal", sendMessage $ JumpToLayout "Hor")
                      , ("@S-h", "Horizontal Golden", sendMessage $ JumpToLayout "HorG")
+                     , ("@C-h", "Toggle Mirror" , (sendMessage $ MT.Toggle MT.MIRROR)) -- >> sendMessage ToggleStruts)
+                     , ("@x", "Toggle Mirror" , (sendMessage $ MT.Toggle RT.REFLECTX)) -- >> sendMessage ToggleStruts)
+                     , ("@y", "Toggle Mirror" , (sendMessage $ MT.Toggle RT.REFLECTY)) -- >> sendMessage ToggleStruts)
                      , ("@v", "Vertical", sendMessage $ JumpToLayout "Ver")
                      , ("@S-v", "Vertical Golden", sendMessage $ JumpToLayout "VerG")
                      , ("@c", "Dwindle", sendMessage $ JumpToLayout "Dwindle")
