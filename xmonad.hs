@@ -82,7 +82,7 @@ import XMonad.Hooks.EwmhDesktops
 --                                       , fontName = ""
 --                                       }
 layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
-       $ toggleLayouts (limitWindows 2 $ makeToggle bareLayout)
+       $ toggleLayouts (limitWindowsWith 3 (tabbedBottom shrinkText def)   $ makeToggle bareLayout)
        -- $ ifMax 1 (ifWider 3000
        --                    (layoutAll (relBox 0.0 0 0.60 1) Full)
        --                    (ifWider 2000
@@ -811,3 +811,37 @@ instance LayoutModifier MinWindow a where
     (_, newLayout) <- runLayout wrs rect
     return (reverse newRec, Nothing)
     
+    
+-- {{{
+data LimitWindowsWith l a = LimitWindowsWith Int (l a) 
+     deriving (Show, Read)
+
+instance (Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWindowsWith l) a where
+  modifyLayoutWithUpdate (LimitWindowsWith limit l) wrs rect = do
+     -- split the stack into 
+     let windows = W.integrate' (W.stack wrs)
+     case splitAt (limit -1) windows of
+      (ws, subws@(w1:w2:_)) ->  do
+        (newRecs, newLayoutM) <- runLayout (wrs {W.stack = W.differentiate $ ws ++ [w1]}) rect 
+        -- extract last rects
+        let subWrs = W.Workspace (W.tag wrs) l (W.differentiate subws)
+        (subRecs, newSubM) <- runLayout (subWrs ) (snd $ last newRecs)
+        let allRecs = init newRecs ++ subRecs
+            newState = case newSubM of
+                            Just sublayout -> Just $ LimitWindowsWith limit sublayout
+                            Nothing -> Nothing
+        return ((allRecs, newLayoutM), newState)
+      _ -> do
+        (newRecs, newLayoutM) <- runLayout wrs rect
+        let subWrs = W.Workspace (W.tag wrs) l Nothing
+        (subRecs, newSubM) <- runLayout (subWrs ) (snd $ last newRecs)
+        let newState = case newSubM of
+                            Just sublayout -> Just $ LimitWindowsWith limit sublayout
+                            Nothing -> Nothing
+        return ((newRecs, newLayoutM), newState)
+
+
+limitWindowsWith n l = ModifiedLayout (LimitWindowsWith n l)
+
+
+      
