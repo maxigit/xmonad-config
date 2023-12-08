@@ -81,7 +81,7 @@ import XMonad.Hooks.EwmhDesktops
 --                                       , inactiveTextColor   = "#ffcc33"
 --                                       , fontName = ""
 --                                       }
-layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) False
+layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
        $ toggleLayouts (noBorders simpleTabbedBottom) 
        -- $ ifMax 1 (ifWider 3000
        --                    (layoutAll (relBox 0.0 0 0.60 1) Full)
@@ -234,9 +234,9 @@ main = do
                                                                       )
 
                        , modMask = modm     -- Rebind Mod to the Windows key
-                       , borderWidth = 2
+                       , borderWidth = 5
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
-                       , normalBorderColor = "darkblue"
+                       , normalBorderColor = "teal"
                        , workspaces = [ p <> ws
                                       | ws <- map show [1..9] ++ map return extraWs
                                       , p <- "" : map show [1..9]
