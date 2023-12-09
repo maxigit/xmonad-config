@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
 import XMonad hiding((|||))
 import Data.Monoid(Endo(..))
@@ -72,7 +72,7 @@ import qualified DBus.Client as D
 import qualified Codec.Binary.UTF8.String as UTF8
 import XMonad.Hooks.EwmhDesktops 
 
-import qualified Layout.MyAdditions as A
+-- import qualified Layout.MyAdditions as A
 
 -- layout = toggleLayouts Full layout'
 -- full = tabbedBottom shrinkText def { activeColor         = "#115422"
@@ -84,7 +84,7 @@ import qualified Layout.MyAdditions as A
 --                                       , fontName = ""
 --                                       }
 layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
-       $ toggleLayouts (limitWindowsWith 3 (tabbedBottom shrinkText def)   $ makeToggle bareLayout)
+       $ toggleLayouts (limitWindowsWith 6 myTabbed  $ makeToggle bareLayout)
        -- $ ifMax 1 (ifWider 3000
        --                    (layoutAll (relBox 0.0 0 0.60 1) Full)
        --                    (ifWider 2000
@@ -93,7 +93,7 @@ layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
        --                    )
        --           )
        -- $ ModifiedLayout (MinWindow 3)
-       $ (limitWindows 6 $ makeToggle bareLayout
+       $ (limitWindowsWith 3 myTabbed $ makeToggle bareLayout
      ||| name "Grid"  Grid)
 
 makeToggle = MT.mkToggle1 MT.NBFULL
@@ -136,6 +136,10 @@ bareLayout = name "Dwindle" (ifWider 1199 (Dwindle R CW 1.5 1.1) (Dwindle D CCW 
             $ layoutAll (relBox 0.5 0.75 1 1) (Dishes 2 (1/2))
 name n = renamed [Replace n] . smartBorders
        
+myTabbed = tabbedBottom shrinkText def { activeColor = "brick"
+                                       -- , activeTextColor = "black"
+                                       ,inactiveColor = "teal"
+                                       }
 extraWs = "abcdghijkmostuvxyz"
 
 myXmobarHook xmproc =  do
@@ -278,14 +282,14 @@ main = do
                      , ("@C-v r", "SilQ", sendMessage $ JumpToLayout "rowOfColumns")
                      , ("@C-v t", "SilQ", sendMessage $ JumpToLayout "tallTabs")
                    -- , ("@2", "Two Pane Layout", sendMessage $ JumpToLayout "Hor2")
-                     , ("@1", "Full Screen", setLimit 1)
-                     , ("@2", "Two Panes Limit", setLimit 2)
-                     , ("@3", "Three Panes Layout", setLimit 3)
-                     , ("@4", "Four Panes Layout", setLimit 4)
-                     , ("@5", "Decrease limit", decreaseLimit)
-                     , ("@6", "Two Pane Layout", setLimit 6)
-                     , ("@7", "Increase limit", increaseLimit)
-                     , ("@8", "Increase limit", setLimit 20)
+                     , ("@1", "Full Screen", setLimit 1 >> sendMessage (LimitChange (const 1)))
+                     , ("@2", "Two Panes Limit", setLimit 2 >> sendMessage (LimitChange (const 2)))
+                     , ("@3", "Three Panes Layout", setLimit 3 >> sendMessage (LimitChange (const 3)))
+                     , ("@4", "Four Panes Layout", setLimit 4 >> sendMessage (LimitChange (const 4)))
+                     , ("@5", "Decrease limit", decreaseLimit >> sendMessage (LimitChange (max 1 . pred)))
+                     , ("@6", "Two Pane Layout", setLimit 6 >> sendMessage (LimitChange (const 6)))
+                     , ("@7", "Increase limit", increaseLimit >> sendMessage (LimitChange succ))
+                     , ("@8", "Increase limit", setLimit 20 >> sendMessage (LimitChange (const 20)))
                      , ("@<Tab>", "Toggle", sendMessage ToggleLayout)
                    -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
@@ -821,40 +825,99 @@ data LimitWindowsWith l a = LimitWindowsWith Int (l a)
 instance (Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWindowsWith l) a where
   modifyLayoutWithUpdate (LimitWindowsWith limit l) wrs rect = do
      -- split the stack into 
-     let windows = W.integrate' (W.stack wrs)
-     case splitAt (limit -1) windows of
-      (ws, subws@(w1:w2:_)) ->  do
-        (newRecs, newLayoutM) <- runLayout (wrs {W.stack = W.differentiate $ ws ++ [w1]}) rect 
-        -- extract last rects
-        let subWrs = W.Workspace (W.tag wrs) l (W.differentiate subws)
-        (subRecs, newSubM) <- runLayout (subWrs ) (snd $ last newRecs)
-        let allRecs = init newRecs ++ subRecs
-            newState = case newSubM of
+     let (stack, subStack) = splitStack limit (W.stack wrs)
+     (newRecs, newLayoutM) <- runLayout (wrs {W.stack = stack}) rect 
+     let subWrs = W.Workspace (W.tag wrs) l subStack
+     (subRecs, newSubM) <- case reverse newRecs of 
+                                (last_:_) -> runLayout (subWrs ) (snd last_)
+                                _ -> return ([], Nothing)
+     let allRecs = case subStack of
+                        Nothing -> newRecs
+                        Just _ -> init newRecs ++ subRecs
+         newState = case newSubM of
                             Just sublayout -> Just $ LimitWindowsWith limit sublayout
                             Nothing -> Nothing
-        return ((allRecs, newLayoutM), newState)
-      _ -> do
-        (newRecs, newLayoutM) <- runLayout wrs rect
-        let subWrs = W.Workspace (W.tag wrs) l Nothing
-        (subRecs, newSubM) <- runLayout (subWrs ) (snd $ last newRecs)
-        let newState = case newSubM of
-                            Just sublayout -> Just $ LimitWindowsWith limit sublayout
-                            Nothing -> Nothing
-        return ((newRecs, newLayoutM), newState)
-  handleMess (LimitWindowsWith limit l) msg = 
-    case msg of 
-      _ -> do
-        newsubm <- handleMessage l msg 
-        return $ case newsubm of
-          Nothing -> Nothing
-          Just newsub -> Just $ LimitWindowsWith limit newsub
+     return ((allRecs, newLayoutM), newState)
 
+  handleMessOrMaybeModifyIt (LimitWindowsWith limit l) msg | Just (LimitChange f) <- fromMessage msg = do
+    return $ Just $ Left $ LimitWindowsWith (f limit) l
+  handleMessOrMaybeModifyIt (LimitWindowsWith limit l) msg =  do
+    -- check where the focus is
+    stackm <- gets (W.stack . W.workspace . W.current . windowset)
+    let lup = maybe 0 (length . W.up) stackm
+        ldown = maybe 0 (length . W.down) stackm
+    case lup of
+         -- nup | nup < limit && ldown > 0  -> return $ Just $ Right msg
+         _ -> do
+           newsubm <- handleMessage l msg 
+           return $ case newsubm of
+             Nothing -> Just $ Right msg
+             Just newsub -> Just $ Left $ LimitWindowsWith limit newsub
+
+data LimitChange = LimitChange (Int -> Int)
+
+instance Message LimitChange
 
       
     
+-- Split the stack into two overlapping stack)
+-- a) 1 [2] 3 | 4   5   6 :   split 3 up [1],[]
+--    <<*>>>>                 split 1    [3], [4...
+--          *>>>>>>>>>>>>
+-- b) 1  2 [3]| 4   5   6 :    split up [1 2] []
+--    <<<<<<*
+--          *>>>>>>>>>>>>
+-- c) 1  2  3 |[4]  5   6 :    split up [1 2 3] []
+--    <<<<<<*
+--          *>>>>>>>>>>>
+-- d) 1  2  3 | 4  [5]  6 :    split up [1 3 4 ] [4]
+--    <<<<<<*
+--          >>>>>>>>*>>>>
+-- e) 1  2 [3]|           :    split up [1 2] []
+--    <<<<<<*
+--          *>>>>>>>>>>>>
+-- f) 1  2  3 |[4]        :    split up [1 2 3] []
+--    <<<<<<*
+--
+-- g |1 [2] 3   4   5   6
+--    *
+--    <<<<*>>>>>>>>>>>>>>>
+--    1  2 [3]  4   5  |6
+--    1  2  3  [4]  5  |6
+--    1  2  3   4  [5] |6
+   --
+--    [ ups Focus up' last up | down'
+--                   [last up |       ] 
+splitStack :: Int -> Maybe (W.Stack a) -> (Maybe (W.Stack a), Maybe (W.Stack a))
+splitStack n Nothing = (Nothing, Nothing)
+splitStack n (Just W.Stack{..}) = 
+  case splitAt n (reverse up) of
+    (ups, []) -> let (u:us) = reverse ups -- cut is >= focus position a b & c
+                 in case splitAt (n - (length ups +1)) down of
+                   ([], subDs) -> -- b
+                                 if length ups == n
+                                 then ( Just $ W.Stack u us []
+                                      , Just $ W.Stack focus [u] subDs
+                                      )
+                                 else ( Just $ W.Stack focus (u:us) []
+                                      , Just $ W.Stack focus [] subDs
+                                      )
+                   (ds, subDs) ->  -- a
+                                 ( Just $ W.Stack focus up ds
+                                 , Just $ W.Stack (last ds) [] subDs
+                                 )
+    ([], d:downs) -> -- cut is before focus g
+                   ( Just $ W.Stack d [] [] 
+                   , Just $ W.Stack focus up down -- original stack
+                   )
+    (ups, downs) -> let (u:us) = reverse ups -- d
+                  in ( Just $ W.Stack u us []
+                     , Just $ W.Stack focus (reverse downs <> [u]) down
+                     )
+limitwindowswith n l = modifyLayout (LimitWindowsWith n l)
 
 
 limitWindowsWith n l = ModifiedLayout (LimitWindowsWith n l)
 
 
-      
+
