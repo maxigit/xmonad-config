@@ -273,7 +273,7 @@ instance ( LayoutClass l1 a, LayoutClass l2 a
 
         (nextlist, next', nchange) <- case next of
           Nothing -> return ([], Nothing, False)
-          Just n  -> do (res, l, ch) <- handle n nexts rect
+          Just n  -> do (res, l, ch) <- handle n nexts $ snd $ last sublist
                         return (res, Just l, ch)
 
         let newlist =  if length (maybe [] W.up s) < length (W.integrate' subs)

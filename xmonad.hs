@@ -48,7 +48,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.AvoidFloats
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spacing
-import qualified XMonad.Layout.LayoutBuilder as B
+import XMonad.Layout.LayoutBuilder
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers hiding(CW)
@@ -72,7 +72,7 @@ import qualified DBus.Client as D
 import qualified Codec.Binary.UTF8.String as UTF8
 import XMonad.Hooks.EwmhDesktops 
 
-import Layout.MyAdditions
+import qualified Layout.MyAdditions as A
 
 -- layout = toggleLayouts Full layout'
 -- full = tabbedBottom shrinkText def { activeColor         = "#115422"
@@ -841,6 +841,17 @@ instance (Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWind
                             Just sublayout -> Just $ LimitWindowsWith limit sublayout
                             Nothing -> Nothing
         return ((newRecs, newLayoutM), newState)
+  handleMess (LimitWindowsWith limit l) msg = 
+    case msg of 
+      _ -> do
+        newsubm <- handleMessage l msg 
+        return $ case newsubm of
+          Nothing -> Nothing
+          Just newsub -> Just $ LimitWindowsWith limit newsub
+
+
+      
+    
 
 
 limitWindowsWith n l = ModifiedLayout (LimitWindowsWith n l)
