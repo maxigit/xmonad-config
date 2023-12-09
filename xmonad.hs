@@ -48,7 +48,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.AvoidFloats
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spacing
-import XMonad.Layout.LayoutBuilder
+import qualified XMonad.Layout.LayoutBuilder as B
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers hiding(CW)
@@ -71,6 +71,8 @@ import qualified DBus as D
 import qualified DBus.Client as D
 import qualified Codec.Binary.UTF8.String as UTF8
 import XMonad.Hooks.EwmhDesktops 
+
+import Layout.MyAdditions
 
 -- layout = toggleLayouts Full layout'
 -- full = tabbedBottom shrinkText def { activeColor         = "#115422"
