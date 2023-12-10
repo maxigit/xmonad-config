@@ -819,13 +819,19 @@ instance LayoutModifier MinWindow a where
     
     
 -- {{{
-data LimitWindowsWith l a = LimitWindowsWith Int (l a) 
+data LimitWindowsWith l a = LimitWindowsWith Int (l a) (Maybe a)
      deriving (Show, Read)
 
-instance (Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWindowsWith l) a where
-  modifyLayoutWithUpdate (LimitWindowsWith limit l) wrs rect = do
+instance (Show a, Read a, Eq a, Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWindowsWith l) a where
+  modifyLayoutWithUpdate (LimitWindowsWith limit l lsf) wrs rect = do
      -- split the stack into 
-     let (stack, subStack) = splitStack limit (W.stack wrs)
+     let (stack, subStack0) = splitStack limit (W.stack wrs)
+         -- focus sublayout to last focus
+         -- if the current focus is not in the sublayout
+         -- This is to make tabbed layout display the last focused window.
+         subStack = case lsf of 
+                        Just foc | fmap W.focus subStack0 /= fmap W.focus (W.stack wrs) -> fmap (setFocus foc) subStack0
+                        _ -> subStack0
      (newRecs, newLayoutM) <- runLayout (wrs {W.stack = stack}) rect 
      let subWrs = W.Workspace (W.tag wrs) l subStack
      (subRecs, newSubM) <- case reverse newRecs of 
@@ -835,13 +841,13 @@ instance (Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWind
                         Nothing -> newRecs
                         Just _ -> init newRecs ++ subRecs
          newState = case newSubM of
-                            Just sublayout -> Just $ LimitWindowsWith limit sublayout
-                            Nothing -> Nothing
-     return ((allRecs, newLayoutM), newState)
+                            Just sublayout -> LimitWindowsWith limit sublayout (fmap W.focus subStack)
+                            Nothing -> LimitWindowsWith limit l (fmap W.focus subStack)
+     return ((allRecs, newLayoutM), Just newState)
 
-  handleMessOrMaybeModifyIt (LimitWindowsWith limit l) msg | Just (LimitChange f) <- fromMessage msg = do
-    return $ Just $ Left $ LimitWindowsWith (f limit) l
-  handleMessOrMaybeModifyIt (LimitWindowsWith limit l) msg =  do
+  handleMessOrMaybeModifyIt (LimitWindowsWith limit l lsf) msg | Just (LimitChange f) <- fromMessage msg = do
+    return $ Just $ Left $ LimitWindowsWith (f limit) l lsf
+  handleMessOrMaybeModifyIt (LimitWindowsWith limit l lsf) msg =  do
     -- check where the focus is
     stackm <- gets (W.stack . W.workspace . W.current . windowset)
     let lup = maybe 0 (length . W.up) stackm
@@ -852,7 +858,7 @@ instance (Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWind
            newsubm <- handleMessage l msg 
            return $ case newsubm of
              Nothing -> Just $ Right msg
-             Just newsub -> Just $ Left $ LimitWindowsWith limit newsub
+             Just newsub -> Just $ Left $ LimitWindowsWith limit newsub lsf
 
 data LimitChange = LimitChange (Int -> Int)
 
@@ -914,10 +920,13 @@ splitStack n (Just W.Stack{..}) =
                   in ( Just $ W.Stack u us []
                      , Just $ W.Stack focus (reverse downs <> [u]) down
                      )
-limitwindowswith n l = modifyLayout (LimitWindowsWith n l)
+
+limitWindowsWith n l = ModifiedLayout (LimitWindowsWith n l Nothing)
 
 
-limitWindowsWith n l = ModifiedLayout (LimitWindowsWith n l)
-
-
+setFocus :: Eq a => a -> W.Stack a -> W.Stack a
+setFocus foc st =
+  case break (== foc) (W.integrate st) of
+    (us, d:ds) -> W.Stack d (reverse us) ds
+    _         -> st
 
