@@ -83,8 +83,8 @@ import XMonad.Hooks.EwmhDesktops
 --                                       , inactiveTextColor   = "#ffcc33"
 --                                       , fontName = ""
 --                                       }
-layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
-       $ toggleLayouts (limitWindowsWith 6 myTabbed  $ makeToggle bareLayout)
+layout = spacingRaw True (Border 0 0 0 0) False (Border 3 3 3 3) False
+       $ toggleLayouts (limitWindowsWith 3 myTabbed  $ makeToggle bareLayout)
        -- $ ifMax 1 (ifWider 3000
        --                    (layoutAll (relBox 0.0 0 0.60 1) Full)
        --                    (ifWider 2000
@@ -93,7 +93,7 @@ layout = spacingRaw True (Border 0 0 0 0) False (Border 5 5 5 5) True
        --                    )
        --           )
        -- $ ModifiedLayout (MinWindow 3)
-       $ (limitWindowsWith 3 myTabbed $ makeToggle bareLayout
+       $ (limitWindowsWith 0 myTabbed $ makeToggle bareLayout
      ||| name "Grid"  Grid)
 
 makeToggle = MT.mkToggle1 MT.NBFULL
@@ -290,6 +290,7 @@ main = do
                      , ("@6", "Two Pane Layout", setLimit 6 >> sendMessage (LimitChange (const 6)))
                      , ("@7", "Increase limit", increaseLimit >> sendMessage (LimitChange succ))
                      , ("@8", "Increase limit", setLimit 20 >> sendMessage (LimitChange (const 20)))
+                     , ("@0", "Increase limit", sendMessage (LimitChange (const 0)))
                      , ("@<Tab>", "Toggle", sendMessage ToggleLayout)
                    -- , ("@S-2", "Two Pane Vertical", sendMessage $ JumpToLayout "Ver2")
                    -- global
@@ -823,6 +824,9 @@ data LimitWindowsWith l a = LimitWindowsWith Int (l a) (Maybe a)
      deriving (Show, Read)
 
 instance (Show a, Read a, Eq a, Show (l a), Read (l a), LayoutClass l a) =>  LayoutModifier (LimitWindowsWith l) a where
+  modifyLayoutWithUpdate (LimitWindowsWith 0 l lsf) wrs rect = do
+     r <- runLayout wrs rect 
+     return (r, Nothing)
   modifyLayoutWithUpdate (LimitWindowsWith limit l lsf) wrs rect = do
      -- split the stack into 
      let (stack, subStack0) = splitStack limit (W.stack wrs)
