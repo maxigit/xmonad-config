@@ -138,7 +138,9 @@ name n = renamed [Replace n] . smartBorders
        
 myTabbed = tabbedBottom shrinkText def { activeColor = "brick"
                                        -- , activeTextColor = "black"
-                                       ,inactiveColor = "teal"
+                                       ,inactiveTextColor = "#97bb72"
+                                       ,inactiveBorderColor = "#97bb72"
+                                       ,inactiveColor = "black"
                                        }
 extraWs = "abcdghijkmostuvxyz"
 
@@ -242,7 +244,7 @@ main = do
                        , modMask = modm     -- Rebind Mod to the Windows key
                        , borderWidth = 5
                        , focusedBorderColor = "#ff0000" -- "#ffffff"
-                       , normalBorderColor = "teal"
+                       , normalBorderColor = "#97bb72"
                        , workspaces = [ p <> ws
                                       | ws <- map show [1..9] ++ map return extraWs
                                       , p <- "" : map show [1..9]
@@ -440,6 +442,9 @@ main = do
            ++ [ ("@a S-" ++ c, "Attach tmux session (Read only)", TH.hookNext "swapNext"  True  >> (spawn $ "gnome-terminal --profile=dark -- tmux attach-session -t" ++ c ++ "-"))
               | c <- map show [0..9]
               ]
+           ++ [ ("@S-a " ++ c, "Attach floating tmux session (Read only) ", TH.hookNext "floatBottom"  True  >> (spawn $ "gnome-terminal --profile=dark -- tmux attach-session -t" ++ c ++ "-"))
+              | c <- map show [0..9]
+              ]
            ++ [ ("@C-n", "Swap next", TH.hookNext "swapNext" True) ]
            ++ [ ("@ k " ++ c, "Kill from workspace", killForeigns (Just c))
               | c <- map show [1..9] ++ map (:[]) extraWs
@@ -618,11 +623,12 @@ killForeigns tagToKillm = do
 
       
   
+  -- x y w h
 centerR = W.RationalRect (1/4) (1/4) (1/2) (1/2)
 bigCenterR = W.RationalRect (1/8) (1/8) (3/4) (3/4)
 leftR = W.RationalRect (0) (1/8) (1/2) (3/4)
 rightR = W.RationalRect (4/8) (1/8) (1/2) (3/4)
-smallRightR = W.RationalRect (3/4) (7/8) (1/4) (1/8)
+smallRightR = W.RationalRect (3/4) (6/8) (1/4) (1/8)
 smallTopR = W.RationalRect (3/4) (2/8) (1/4) (1/8)
 
 myManageHook = composeAll
@@ -633,6 +639,7 @@ myManageHook = composeAll
   -- , TH.toggleHook "swapNext" (pure $ Endo W.swapUp)
   -- , TH.toggleHook "swapNext" doFloat
   , TH.toggleHook "swapNext" (pure $ Endo swapMasterOrShift)
+  , TH.toggleHook "floatBottom" $ doRectFloat smallRightR
   ]
 
 
