@@ -1,4 +1,4 @@
-resolver: lts-16.27
+resolver: lts-20.26
 packages: 
   - .
 extra-deps:
@@ -32,9 +32,10 @@ extra-deps:
   - status-notifier-item-0.3.0.1
   - time-units-1.0.0
   - xml-helpers-1.0.0
-  - xmonad-0.15
+  - xmonad
   - /home/max/devel/xmonad-testing/xmonad-contrib
 #- xmonad-contrib-0.16 
+allow-newer: true
 nix:
   enable: true
   packages:
@@ -57,7 +58,4 @@ nix:
     - xorg.libXrender
     - xorg.libXScrnSaver
     - zlib
-  path: [
-    "nixpkgs=https://github.com/NixOS/nixpkgs/archive/e34208e.tar.gz"
-  ]
 

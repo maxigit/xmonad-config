@@ -60,6 +60,7 @@ import XMonad.Util.EZConfig(additionalKeysP, mkNamedKeymap, mkKeymap)
 import XMonad.Util.NamedActions
 import XMonad.Util.WindowProperties as P
 import System.IO
+import System.Environment (setEnv)
 import Data.Bits(complement, (.&.))
 import Data.Char (toLower)
 import Data.List(isSuffixOf, stripPrefix)
@@ -223,6 +224,7 @@ main = do
     dbus <- D.connectSession
     getWellKnownName dbus
     _ <- spawn "xvisbell"
+    setEnv "BROWSER" "qutebrowser"
 
     let config =  docks $ def
                        { manageHook = myManageHook <+> manageHook def
@@ -365,8 +367,8 @@ main = do
                        , ("@ s k", "Search in Dictionary", promptSearch' xpConfig hackage)
                        , ("@ s w", "Search in Dictionary", promptSearch' xpConfig wikipedia)
                        , ("@ s s", "Search in Dictionary", promptSearch' xpConfig duckduckgo) -- multi)
-                       , ("@ s t", "Search in Dictionary", promptSearch' xpConfig stackage)
-                       , ("@ s f", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-12.26" "http://stackage.org/lts-12.26/hoogle?q=")
+                       -- , ("@ s t", "Search in Dictionary", promptSearch' xpConfig stackage)
+                       , ("@ s t", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-20.26" "http://stackage.org/lts-12.26/hoogle?q=")
                        , ("@ s m", "Search in Dictionary", promptSearch' xpConfig $ searchEngine "lts-10.9" "http://stackage.org/lts-10.9/hoogle?q=")
                    -- virtual monitor
                        , ("@ z d", "Split virtual monitor", myRescreen (\_ r -> r ++ [ Rectangle 2560 0 800 320]))
